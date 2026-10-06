@@ -112,7 +112,7 @@ async function adapt(handler, req, res) {
   }
 }
 
-app.get('/health', (req, res) => res.json({ ok: true, service: 'quick-assess-better-tools' }));
+app.get('/health', (req, res) => res.json({ ok: true, service: 'quick-assess-better-tools', aiProvider: process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN ? 'cloudflare' : process.env.OPENAI_API_KEY ? 'openai' : process.env.ANTHROPIC_API_KEY ? 'anthropic' : 'not_configured' }));
 app.post('/api/interpret', (req, res) => adapt(interpret, req, res));
 app.post('/api/ia-analysis', (req, res) => adapt(iaAnalysis, req, res));
 app.post('/api/diagnostic-analysis', (req, res) => adapt(diagnosticAnalysis, req, res));

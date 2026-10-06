@@ -100,7 +100,7 @@ export async function onRequestPost(context) {
     return new Response(JSON.stringify(parsed), { status: 200, headers: corsHeaders });
 
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 502, headers: corsHeaders });
+    return new Response(JSON.stringify({ error: e?.message || String(e) || 'AI request failed' }), { status: 502, headers: corsHeaders });
   }
 }
 
