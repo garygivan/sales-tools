@@ -93,8 +93,20 @@ async function adapt(handler, req, res) {
   try {
     const response = await handler.onRequestPost({ request: makeRequest(req), env });
     const status = response.status || 200;
-    if (response.headers) Object.entries(response.headers).forEach(([k, v]) => res.setHeader(k, v));
-    res.status(status).send(response.body ?? '');
+    if (response.headers) {
+      if (typeof response.headers.forEach === 'function') {
+        response.headers.forEach((v, k) => res.setHeader(k, v));
+      } else {
+        Object.entries(response.headers).forEach(([k, v]) => res.setHeader(k, v));
+      }
+    }
+    let body = '';
+    if (typeof response.text === 'function') {
+      body = await response.text();
+    } else {
+      body = response.body ?? '';
+    }
+    res.status(status).send(body);
   } catch (e) {
     res.status(500).json({ error: e.message || String(e) });
   }
