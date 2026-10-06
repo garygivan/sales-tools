@@ -1,0 +1,3621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Assess — Enterprise HCM Opportunity Assessment</title>
+<style>
+  :root {
+    --orange:      #E05206;
+    --orange-dark: #b84004;
+    --orange-light:#fdf0e8;
+    --ink:         #1a1a1a;
+    --muted:       #5a5a5b;
+    --border:      #e0d5cc;
+    --surface:     #faf8f6;
+    --white:       #ffffff;
+    --charcoal:    #3B3B3C;
+    --s1:          #d97706;
+    --s2:          #2563eb;
+    --s3:          #7c3aed;
+    --s4:          #16a34a;
+    --radius:      8px;
+    --shadow:      0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header { background: var(--charcoal); color: var(--white); padding: 20px 32px 18px; }
+  .header-inner { display: flex; align-items: center; gap: 14px; }
+  .header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em; }
+  .header p { font-size: 0.85rem; opacity: 0.75; margin-top: 6px; }
+
+  /* ── Layout ── */
+  .main { max-width: 960px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* ── Deal header card ── */
+  .deal-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px;
+    margin-bottom: 20px; box-shadow: var(--shadow);
+  }
+  .deal-card-title {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 14px;
+  }
+  .deal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+  @media (max-width: 600px) { .deal-grid { grid-template-columns: 1fr; } }
+  .deal-field { display: flex; flex-direction: column; gap: 4px; }
+  .deal-field label {
+    font-size: 0.72rem; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .deal-field input {
+    font-size: 0.875rem; font-family: inherit; padding: 7px 10px;
+    border: 1px solid var(--border); border-radius: 6px;
+    color: var(--ink); background: var(--white); transition: border-color 0.15s;
+  }
+  .deal-field input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,82,6,0.1); }
+  .deal-field input::placeholder { color: #bbb; }
+
+  /* ── Stage banner ── */
+  .stage-banner {
+    border-radius: var(--radius); padding: 16px 22px; margin-bottom: 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: var(--shadow); transition: background 0.3s, border-color 0.3s;
+  }
+  .stage-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; }
+  .stage-name  { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; }
+  .stage-hint  { font-size: 0.78rem; opacity: 0.75; margin-top: 4px; }
+  .stage-pct   { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.03em; text-align: right; }
+  .stage-pct-label { font-size: 0.72rem; opacity: 0.7; text-align: right; margin-top: 2px; }
+
+  .banner-prequal { background: #f5f5f5; border: 1px solid #ddd; color: var(--charcoal); }
+  .banner-s1 { background: #fffbeb; border: 2px solid var(--s1); color: var(--s1); }
+  .banner-s2 { background: #eff6ff; border: 2px solid var(--s2); color: var(--s2); }
+  .banner-s3 { background: #f5f3ff; border: 2px solid var(--s3); color: var(--s3); }
+  .banner-s4 { background: #f0fdf4; border: 2px solid var(--s4); color: var(--s4); }
+
+  /* ── Stage sections ── */
+  .stage-section { margin-bottom: 16px; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+
+  .stage-toggle {
+    width: 100%; display: flex; align-items: center; gap: 12px;
+    padding: 14px 18px; border: none; cursor: pointer; text-align: left;
+    font-family: inherit; transition: opacity 0.15s;
+  }
+  .stage-toggle:hover { opacity: 0.9; }
+
+  .stage-dot {
+    width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800; flex-shrink: 0;
+  }
+  .stage-toggle-name { font-size: 0.95rem; font-weight: 800; }
+  .stage-toggle-sub  { font-size: 0.75rem; opacity: 0.8; margin-top: 1px; }
+  .stage-toggle-title { flex: 1; }
+  .stage-toggle-stats { font-size: 0.78rem; font-weight: 700; opacity: 0.85; white-space: nowrap; }
+  .stage-chevron { font-size: 0.85rem; opacity: 0.7; transition: transform 0.2s; }
+  .stage-toggle.open .stage-chevron { transform: rotate(180deg); }
+
+  .stage-body { display: none; background: var(--white); border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
+  .stage-body.open { display: block; }
+
+  /* ── Combined stage sub-headers ── */
+  .stage-sub-hdr {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 18px; border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .stage-sub-hdr:first-child { border-top: none; }
+  .stage-sub-hdr-dot {
+    width: 26px; height: 26px; border-radius: 50%; background: rgba(255,255,255,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.78rem; font-weight: 800; flex-shrink: 0;
+  }
+  .stage-sub-hdr-name { font-size: 0.88rem; font-weight: 800; }
+  .stage-sub-hdr-sub  { font-size: 0.72rem; opacity: 0.8; margin-top: 1px; }
+  .stage-sub-hdr-title { flex: 1; }
+
+  /* ── Subsection labels ── */
+  .sub-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); padding: 9px 16px 6px; border-top: 1px solid #f0f0f0; background: #fafafa;
+  }
+  .sub-label:first-child { border-top: none; }
+
+  /* ── Criterion rows ── */
+  .crit-row {
+    display: grid; grid-template-columns: 22px 1fr auto;
+    gap: 10px; align-items: start; padding: 10px 16px;
+    border-bottom: 1px solid #f0f0f0; transition: background 0.12s;
+  }
+  .crit-row:last-child { border-bottom: none; }
+  .crit-row:hover { background: #fafafa; }
+  .crit-row.checked { background: #f8fef9; }
+
+  .crit-check { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--orange); cursor: pointer; }
+
+  .crit-main { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .crit-text { font-size: 0.875rem; color: var(--ink); font-weight: 500; line-height: 1.4; }
+  .crit-text.done { text-decoration: line-through; color: var(--muted); }
+
+  .crit-input {
+    font-size: 0.78rem; font-family: inherit; padding: 5px 8px;
+    border: 1px solid #e8e8e8; border-radius: 4px; color: var(--ink);
+    background: var(--white); width: 100%; transition: border-color 0.15s;
+  }
+  .crit-input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 2px rgba(224,82,6,0.1); }
+  .crit-input::placeholder { color: #ccc; font-style: italic; }
+  .crit-input.desc { font-weight: 600; }
+
+  .crit-right { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 80px; }
+
+  .status-badge {
+    font-size: 0.65rem; font-weight: 700; padding: 2px 7px;
+    border-radius: 99px; letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .badge-done    { background: #dcfce7; color: #166534; }
+  .badge-pending { background: #f3f4f6; color: #6b7280; }
+  .badge-risk    { background: #fee2e2; color: #991b1b; }
+
+  .crit-owner {
+    font-size: 0.67rem; font-weight: 700; padding: 2px 6px;
+    border-radius: 99px; background: #f0f0f0; color: var(--muted);
+    white-space: nowrap; letter-spacing: 0.02em;
+  }
+
+  /* ── Action Planner ── */
+  .action-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow); margin-top: 20px;
+  }
+  .action-head {
+    background: var(--charcoal); color: var(--white);
+    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .action-head h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .add-btn {
+    background: rgba(255,255,255,0.15); color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3); border-radius: 6px;
+    padding: 5px 14px; font-size: 0.8rem; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .add-btn:hover { background: rgba(255,255,255,0.25); }
+
+  .action-hint {
+    padding: 10px 16px; font-size: 0.78rem; color: var(--muted);
+    font-style: italic; border-bottom: 1px solid var(--border);
+  }
+  .action-col-heads {
+    display: grid; grid-template-columns: 110px 150px 1fr 80px 120px 28px;
+    gap: 6px; padding: 6px 16px; background: #f8f8f8; border-bottom: 1px solid var(--border);
+  }
+  .action-col-head { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  @media (max-width: 700px) { .action-col-heads { display: none; } }
+
+  .action-row {
+    display: grid; grid-template-columns: 110px 150px 1fr 80px 120px 28px;
+    gap: 6px; padding: 8px 16px; border-bottom: 1px solid #f0f0f0; align-items: center;
+  }
+  .action-row:last-child { border-bottom: none; }
+  @media (max-width: 700px) { .action-row { grid-template-columns: 1fr; } }
+
+  .action-row select, .action-row input[type="text"], .action-row input[type="date"] {
+    font-size: 0.8rem; font-family: inherit; padding: 5px 7px;
+    border: 1px solid #e8e8e8; border-radius: 4px; color: var(--ink);
+    background: var(--white); width: 100%;
+  }
+  .action-row select:focus, .action-row input:focus { outline: none; border-color: var(--orange); }
+
+  .remove-btn {
+    background: none; border: none; color: #ccc; cursor: pointer;
+    font-size: 1rem; padding: 4px; line-height: 1; transition: color 0.15s;
+  }
+  .remove-btn:hover { color: #dc2626; }
+
+  .no-actions { padding: 16px 20px; font-size: 0.82rem; color: #bbb; font-style: italic; }
+
+  /* ── Save area ── */
+  .save-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-top: 20px;
+    box-shadow: var(--shadow); overflow: hidden;
+  }
+  .notes-area { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .notes-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px;
+  }
+  textarea.notes-ta {
+    width: 100%; min-height: 70px; border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 12px; font-size: 0.85rem;
+    font-family: inherit; color: var(--ink); resize: vertical;
+    transition: border-color 0.15s;
+  }
+  textarea.notes-ta:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,82,6,0.1); }
+  textarea.notes-ta::placeholder { color: #bbb; }
+
+  .save-bar { display: flex; gap: 10px; padding: 14px 20px; align-items: center; }
+  .save-btn {
+    flex: 1; padding: 10px 14px; font-size: 0.82rem; font-weight: 700;
+    border-radius: 6px; border: none; cursor: pointer; letter-spacing: 0.02em;
+    font-family: inherit; transition: opacity 0.15s, transform 0.1s;
+  }
+  .save-btn:active { transform: scale(0.97); opacity: 0.85; }
+  .save-btn.copy  { background: var(--charcoal); color: var(--white); }
+  .save-btn.pdf   { background: var(--orange);   color: var(--white); }
+  .save-btn.link  { background: #2563eb;          color: var(--white); }
+  .save-btn:hover { opacity: 0.88; }
+
+  .copy-confirm { font-size: 0.78rem; font-weight: 600; color: #166534; opacity: 0; transition: opacity 0.3s; }
+  .copy-confirm.show { opacity: 1; }
+
+  /* ── My Deals modal ── */
+  .md-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1200;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .md-overlay.open { display: flex; }
+  .md-modal {
+    background: var(--white); border-radius: 10px; width: 100%; max-width: 560px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22); overflow: hidden; animation: qv-in 0.18s ease;
+    max-height: 80vh; display: flex; flex-direction: column;
+  }
+  .md-list-scroll { overflow-y: auto; flex: 1; }
+  .md-deal-row {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 10px; padding: 12px 20px; border-bottom: 1px solid #f0f0f0;
+    align-items: center; transition: background 0.12s;
+  }
+  .md-deal-row:hover { background: var(--surface); }
+  .md-deal-name { font-size: 0.88rem; font-weight: 700; color: var(--ink); }
+  .md-deal-meta { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+  .md-deal-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .md-open-btn {
+    padding: 5px 12px; background: var(--orange); color: #fff;
+    border: none; border-radius: 5px; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: opacity 0.15s;
+  }
+  .md-open-btn:hover { opacity: 0.88; }
+  .md-del-btn {
+    padding: 5px 8px; background: #f3f4f6; color: #9ca3af;
+    border: none; border-radius: 5px; font-size: 0.75rem;
+    cursor: pointer; font-family: inherit; transition: color 0.15s;
+  }
+  .md-del-btn:hover { color: #dc2626; background: #fee2e2; }
+  .md-empty { padding: 24px 20px; font-size: 0.85rem; color: #bbb; font-style: italic; text-align: center; }
+  .md-stage-chip {
+    display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 99px; margin-left: 6px; vertical-align: middle;
+  }
+  .md-s0 { background: #f3f4f6; color: #6b7280; }
+  .md-s1 { background: #fef3c7; color: #92400e; }
+  .md-s2 { background: #dbeafe; color: #1e3a8a; }
+  .md-s3 { background: #ede9fe; color: #5b21b6; }
+  .md-s4 { background: #dcfce7; color: #166534; }
+
+  /* ── Deal Analytics ── */
+  .analytics-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .analytics-head {
+    background: #1e293b; color: var(--white);
+    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .analytics-head h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+  .analytics-body { padding: 16px 20px; }
+
+  /* IA Analysis */
+  .ia-input-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .ia-textarea {
+    flex: 1; min-height: 90px; font-size: 0.8rem; font-family: inherit;
+    padding: 9px 11px; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--ink); resize: vertical;
+  }
+  .ia-textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(224,82,6,0.1); }
+  .ia-run-btn {
+    padding: 9px 16px; background: var(--orange); color: #fff;
+    border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; white-space: nowrap; transition: opacity 0.15s;
+    align-self: flex-start;
+  }
+  .ia-run-btn:hover { opacity: 0.88; }
+  .ia-run-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .ia-load-btn {
+    display: inline-block; padding: 6px 11px; background: #f3f4f6; color: #374151;
+    border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: background 0.15s; white-space: nowrap;
+    align-self: flex-start;
+  }
+  .ia-load-btn:hover { background: #e5e7eb; }
+  .ia-status { font-size: 0.78rem; margin-bottom: 10px; min-height: 18px; }
+  .ia-status.loading { color: #2563eb; }
+  .ia-status.error   { color: #dc2626; }
+  .ia-status.success { color: #16a34a; }
+
+  .ia-results { display: none; }
+  .ia-results.visible { display: block; }
+
+  .ia-summary {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 12px 14px; font-size: 0.82rem; color: var(--ink);
+    line-height: 1.55; margin-bottom: 16px;
+  }
+
+  .ia-section-title {
+    font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.07em; margin-bottom: 8px; padding-bottom: 5px;
+    border-bottom: 2px solid;
+  }
+  .ia-section-title.goals   { color: #1e40af; border-color: #bfdbfe; }
+  .ia-section-title.positive { color: #15803d; border-color: #bbf7d0; }
+  .ia-section-title.negative { color: #991b1b; border-color: #fecaca; }
+  .ia-section-title.concerns { color: #92400e; border-color: #fde68a; }
+
+  .ia-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 640px) { .ia-grid { grid-template-columns: 1fr; } }
+
+  .ia-card {
+    border-radius: 6px; overflow: hidden; border: 1px solid;
+  }
+  .ia-card.goals   { border-color: #bfdbfe; }
+  .ia-card.positive { border-color: #bbf7d0; }
+  .ia-card.negative { border-color: #fecaca; }
+  .ia-card.concerns { border-color: #fde68a; }
+
+  .ia-card-head {
+    padding: 7px 12px; font-size: 0.68rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .ia-card.goals    .ia-card-head { background: #dbeafe; color: #1e40af; }
+  .ia-card.positive .ia-card-head { background: #dcfce7; color: #15803d; }
+  .ia-card.negative .ia-card-head { background: #fee2e2; color: #991b1b; }
+  .ia-card.concerns .ia-card-head { background: #fef3c7; color: #92400e; }
+
+  .ia-card-body { padding: 8px 12px 10px; }
+
+  .ia-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f3f4f6; }
+  .ia-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .ia-quote {
+    font-size: 0.8rem; font-style: italic; color: var(--ink);
+    line-height: 1.5; margin-bottom: 4px;
+  }
+  .ia-quote::before { content: '"'; }
+  .ia-quote::after  { content: '"'; }
+  .ia-context { font-size: 0.72rem; color: var(--muted); line-height: 1.4; }
+  .ia-goal-text { font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; line-height: 1.4; }
+  .ia-goal-quote { font-size: 0.72rem; font-style: italic; color: #4b5563; line-height: 1.4; }
+  .ia-goal-quote::before { content: '"'; }
+  .ia-goal-quote::after  { content: '"'; }
+  .ia-empty { font-size: 0.75rem; color: #bbb; font-style: italic; padding: 4px 0; }
+
+  .ia-timestamp { font-size: 0.68rem; color: #9ca3af; margin-top: 12px; text-align: right; }
+
+  /* ── Diagnostic Analysis ── */
+  .diag-module-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; margin-top: 12px;
+  }
+  @media (max-width: 640px) { .diag-module-grid { grid-template-columns: 1fr; } }
+
+  .diag-module {
+    border-radius: 6px; border: 1px solid #e5e7eb; overflow: hidden;
+  }
+  .diag-module-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 7px 12px; font-size: 0.7rem; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    background: #f3f4f6; color: var(--charcoal);
+  }
+  .diag-signal {
+    font-size: 0.62rem; font-weight: 700; padding: 2px 7px;
+    border-radius: 99px; letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .diag-signal.pain     { background: #fee2e2; color: #991b1b; }
+  .diag-signal.positive { background: #dcfce7; color: #15803d; }
+  .diag-signal.neutral  { background: #f3f4f6; color: #6b7280; }
+  .diag-signal.emphasis { background: #fef3c7; color: #92400e; }
+
+  .diag-module-body { padding: 8px 12px 10px; }
+  .diag-summary { font-size: 0.78rem; color: var(--ink); line-height: 1.5; margin-bottom: 7px; }
+  .diag-quote {
+    font-size: 0.74rem; font-style: italic; color: #4b5563;
+    line-height: 1.45; padding: 4px 0 4px 10px;
+    border-left: 2px solid #e5e7eb; margin-bottom: 4px;
+  }
+  .diag-quote::before { content: '"'; }
+  .diag-quote::after  { content: '"'; }
+  .diag-empty { font-size: 0.75rem; color: #d1d5db; font-style: italic; padding: 4px 0; }
+
+  .diag-module.emphasis-module { border-color: #fde68a; }
+  .diag-module.emphasis-module .diag-module-head { background: #fef3c7; color: #92400e; }
+
+  .diag-summary-box {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;
+    padding: 11px 14px; font-size: 0.82rem; color: var(--ink);
+    line-height: 1.55; margin-bottom: 14px;
+  }
+
+  /* ── Demo Analysis ── */
+  .demo-area {
+    border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 14px;
+  }
+  .demo-area-head {
+    background: #1e293b; color: #fff;
+    padding: 9px 14px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.03em;
+  }
+  .demo-area-body { padding: 0; }
+  .demo-sentiment-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid #f0f0f0;
+  }
+  @media (max-width: 700px) { .demo-sentiment-row { grid-template-columns: 1fr; } }
+  .demo-sentiment-col { padding: 10px 12px; }
+  .demo-sentiment-col + .demo-sentiment-col { border-left: 1px solid #f0f0f0; }
+  .demo-col-label {
+    font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 7px;
+  }
+  .demo-col-label.pos { color: #15803d; }
+  .demo-col-label.neg { color: #991b1b; }
+  .demo-col-label.neu { color: #92400e; }
+
+  .demo-quote-item { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #f5f5f5; }
+  .demo-quote-item:last-child { margin-bottom:0; padding-bottom:0; border-bottom:none; }
+  .demo-quote {
+    font-size: 0.75rem; font-style: italic; color: var(--ink);
+    line-height: 1.45; margin-bottom: 3px;
+  }
+  .demo-quote::before { content: '"'; }
+  .demo-quote::after  { content: '"'; }
+  .demo-context { font-size: 0.7rem; color: var(--muted); line-height: 1.35; }
+
+  /* Open items table */
+  .demo-open-wrap {
+    border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 14px;
+  }
+  .demo-open-head {
+    background: #374151; color: #fff;
+    padding: 9px 14px; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.03em;
+  }
+  .demo-open-section { padding: 10px 14px; border-top: 1px solid #f0f0f0; }
+  .demo-open-section:first-child { border-top: none; }
+  .demo-open-label {
+    font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; margin-bottom: 7px;
+  }
+  .demo-open-label.unanswered { color: #dc2626; }
+  .demo-open-label.answered   { color: #15803d; }
+  .demo-open-label.followup   { color: #2563eb; }
+  .demo-open-item {
+    font-size: 0.78rem; padding: 5px 0; border-bottom: 1px solid #f5f5f5;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .demo-open-item:last-child { border-bottom: none; }
+  .demo-open-q { font-weight: 600; color: var(--ink); line-height: 1.4; }
+  .demo-open-meta { font-size: 0.7rem; color: var(--muted); }
+
+  /* Other / catch-all */
+  .demo-other-item {
+    padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 0.78rem;
+  }
+  .demo-other-item:last-child { border-bottom: none; }
+  .demo-other-topic {
+    display: inline-block; font-size: 0.63rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 99px; background: #f3f4f6; color: #374151; margin-bottom: 4px;
+  }
+  .demo-other-quote { font-style: italic; color: var(--ink); line-height: 1.45; margin-bottom: 3px; }
+  .demo-other-quote::before { content: '"'; }
+  .demo-other-quote::after  { content: '"'; }
+  .demo-other-context { font-size: 0.7rem; color: var(--muted); line-height: 1.35; }
+
+  /* ── AI Action Items ── */
+  .ai-actions-wrap {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); overflow: hidden;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+  }
+  .ai-actions-head {
+    background: #7c3aed; color: var(--white);
+    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .ai-actions-head h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin: 0; }
+  .ai-actions-tabs {
+    display: flex; gap: 2px; background: rgba(255,255,255,0.12);
+    border-radius: 7px; padding: 3px; flex-wrap: wrap;
+  }
+  .ai-actions-tab {
+    padding: 5px 12px; font-size: 0.72rem; font-weight: 700; border-radius: 5px;
+    cursor: pointer; border: none; background: transparent; color: rgba(255,255,255,0.7);
+    font-family: inherit; transition: all 0.15s; white-space: nowrap;
+  }
+  .ai-actions-tab.active { background: var(--white); color: #7c3aed; }
+  .ai-actions-tab:hover:not(.active) { background: rgba(255,255,255,0.18); color: #fff; }
+
+  .ai-actions-body { padding: 16px 20px; }
+
+  .ai-source-section { margin-bottom: 20px; }
+  .ai-source-label {
+    font-size: 0.68rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--muted); margin-bottom: 8px;
+    padding-bottom: 5px; border-bottom: 1px solid #f0f0f0;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ai-source-count {
+    font-size: 0.65rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 99px; background: #f3f4f6; color: #6b7280;
+  }
+
+  .ai-action-item {
+    display: grid; grid-template-columns: 20px 1fr auto;
+    gap: 10px; align-items: start; padding: 9px 12px;
+    border: 1px solid #f0f0f0; border-radius: 6px; margin-bottom: 6px;
+    transition: background 0.12s;
+  }
+  .ai-action-item:last-child { margin-bottom: 0; }
+  .ai-action-item.done { background: #f9fafb; opacity: 0.65; }
+  .ai-action-item:hover { background: #fafafa; }
+
+  .ai-action-check {
+    width: 16px; height: 16px; margin-top: 3px;
+    accent-color: #7c3aed; cursor: pointer; flex-shrink: 0;
+  }
+  .ai-action-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .ai-action-desc {
+    font-size: 0.85rem; font-weight: 600; color: var(--ink); line-height: 1.4;
+  }
+  .ai-action-item.done .ai-action-desc { text-decoration: line-through; color: var(--muted); }
+  .ai-action-context { font-size: 0.72rem; color: var(--muted); line-height: 1.35; }
+  .ai-action-resolve-note { font-size: 0.72rem; color: #15803d; font-style: italic; line-height: 1.35; }
+  .ai-action-meta {
+    display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin-top: 4px;
+  }
+  .ai-action-badge {
+    font-size: 0.62rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 99px; white-space: nowrap;
+  }
+  .ai-action-badge.owner   { background: #ede9fe; color: #5b21b6; }
+  .ai-action-badge.due     { background: #dbeafe; color: #1e3a8a; }
+  .ai-action-badge.source  { background: #f3f4f6; color: #374151; }
+  .ai-action-badge.high    { background: #fee2e2; color: #991b1b; }
+  .ai-action-badge.medium  { background: #fef3c7; color: #92400e; }
+  .ai-action-badge.low     { background: #f0fdf4; color: #166534; }
+
+  .ai-action-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .ai-action-del {
+    font-size: 0.7rem; color: #d1d5db; background: none; border: none;
+    cursor: pointer; padding: 2px 4px; border-radius: 3px;
+  }
+  .ai-action-del:hover { color: #dc2626; background: #fee2e2; }
+
+  .ai-email-strip {
+    background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  .ai-email-label {
+    font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #7c3aed; margin-bottom: 8px;
+  }
+  .ai-email-row { display: flex; gap: 10px; align-items: flex-start; }
+  .ai-email-status { font-size: 0.75rem; margin-top: 6px; min-height: 16px; }
+  .ai-email-status.loading { color: #2563eb; }
+  .ai-email-status.error   { color: #dc2626; }
+  .ai-email-status.success { color: #16a34a; }
+
+  .ai-actions-empty {
+    font-size: 0.8rem; color: #d1d5db; font-style: italic;
+    padding: 12px 0; text-align: center;
+  }
+
+  .ai-actions-add-bar {
+    display: flex; gap: 8px; align-items: center; margin-top: 14px;
+    padding-top: 14px; border-top: 1px solid #f0f0f0;
+  }
+  .ai-actions-add-input {
+    flex: 1; font-size: 0.82rem; font-family: inherit; padding: 7px 10px;
+    border: 1px solid var(--border); border-radius: 6px; color: var(--ink);
+  }
+  .ai-actions-add-input:focus { outline: none; border-color: #7c3aed; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
+  .ai-actions-add-btn {
+    padding: 7px 14px; background: #7c3aed; color: #fff;
+    border: none; border-radius: 6px; font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+  }
+  .ai-actions-add-btn:hover { opacity: 0.88; }
+
+  /* ── Upload strip ── */
+  .upload-strip {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 11px 20px; border-top: 1px solid var(--border);
+    background: #f8f6f4;
+  }
+  .upload-strip-label { display: flex; align-items: center; gap: 10px; font-size: 0.82rem; font-weight: 700; color: var(--charcoal); }
+  .upload-hint { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+  .upload-strip-right { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .upload-btn {
+    display: inline-block; padding: 7px 14px; background: var(--orange); color: #fff;
+    border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: opacity 0.15s; border: none;
+  }
+  .upload-btn:hover { opacity: 0.88; }
+  .api-key-btn {
+    padding: 7px 12px; background: #f3f4f6; color: #374151; border: 1px solid #d1d5db;
+    border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: background 0.15s;
+  }
+  .api-key-btn:hover { background: #e5e7eb; }
+  .upload-status {
+    padding: 10px 20px; font-size: 0.82rem; border-top: 1px solid var(--border);
+  }
+  .upload-status.loading { color: #2563eb; }
+  .upload-status.error   { color: #dc2626; }
+  .upload-status.success { color: #16a34a; }
+
+  /* ── API key / AI modals ── */
+  .ak-overlay, .ai-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1200;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .ak-overlay.open, .ai-overlay.open { display: flex; }
+  .ak-modal {
+    background: var(--white); border-radius: 10px; width: 100%; max-width: 480px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22); overflow: hidden; animation: qv-in 0.18s ease;
+  }
+  .ai-modal {
+    background: var(--white); border-radius: 10px; width: 100%; max-width: 640px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22); overflow: hidden; animation: qv-in 0.18s ease;
+  }
+  .ak-head {
+    background: var(--charcoal); color: #fff; padding: 14px 18px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+
+  /* AI results list */
+  .ai-section-hdr {
+    font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: #fff; padding: 7px 16px; margin: 0;
+  }
+  .ai-section-hdr.s1 { background: #d97706; }
+  .ai-section-hdr.s2 { background: #2563eb; }
+  .ai-section-hdr.s3 { background: #7c3aed; }
+  .ai-section-hdr.s4 { background: #16a34a; }
+  .ai-section-hdr.deal { background: #374151; }
+  .ai-section-hdr.actions { background: #374151; }
+
+  .ai-item {
+    display: grid; grid-template-columns: 28px 1fr;
+    gap: 8px; padding: 9px 16px; border-bottom: 1px solid #f0f0f0;
+    align-items: start; cursor: pointer;
+  }
+  .ai-item:hover { background: #fafafa; }
+  .ai-item input[type=checkbox] { margin-top: 3px; accent-color: var(--orange); width: 15px; height: 15px; }
+  .ai-item-body { display: flex; flex-direction: column; gap: 3px; }
+  .ai-item-q { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  .ai-item-val { font-size: 0.82rem; color: var(--ink); font-weight: 600; }
+  .ai-item-note { font-size: 0.75rem; color: #4b5563; font-style: italic; }
+  .ai-empty { padding: 12px 16px; font-size: 0.8rem; color: #bbb; font-style: italic; }
+
+  /* ── Sheet View modal ── */
+  .sv-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1100;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(3px);
+    overflow-y: auto; padding: 16px;
+  }
+  .sv-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+  .sv-modal {
+    background: #f0f0f0; border-radius: 8px; width: 100%; max-width: 900px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.3); overflow: hidden;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    animation: qv-in 0.18s ease;
+  }
+
+  .sv-head {
+    background: #1e3a5f; color: #fff;
+    padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .sv-head-left { flex: 1; min-width: 0; }
+  .sv-title { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+  .sv-subtitle { font-size: 0.75rem; opacity: 0.75; margin-top: 3px; }
+  .sv-head-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  .sv-stage-chip {
+    font-size: 0.72rem; font-weight: 800; padding: 4px 12px; border-radius: 99px;
+    background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.35);
+    letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .sv-copy-btn, .sv-print-btn {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; border-radius: 5px; padding: 4px 10px; font-size: 0.75rem;
+    font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .sv-copy-btn:hover, .sv-print-btn:hover { background: rgba(255,255,255,0.28); }
+  .sv-close {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; border-radius: 5px; padding: 4px 10px; font-size: 0.82rem;
+    font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .sv-close:hover { background: rgba(255,255,255,0.25); }
+
+  .sv-body { padding: 14px 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+  /* Deal info row */
+  .sv-info-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    background: #fff; border: 1px solid #d0d0d0; border-radius: 6px; padding: 10px 12px;
+  }
+  @media (max-width: 640px) { .sv-info-grid { grid-template-columns: 1fr 1fr; } }
+  .sv-info-cell { display: flex; flex-direction: column; gap: 2px; }
+  .sv-info-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #888; }
+  .sv-info-val { font-size: 0.82rem; font-weight: 600; color: #1a1a1a; }
+  .sv-info-val.empty { color: #bbb; font-style: italic; font-weight: 400; }
+
+  /* Stage section */
+  .sv-stage-block { border-radius: 6px; overflow: hidden; border: 1px solid #d0d0d0; }
+  .sv-stage-hdr {
+    display: grid; grid-template-columns: 28px 1fr 110px 160px;
+    gap: 0; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #fff; padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .sv-stage-hdr.s1 { background: #d97706; }
+  .sv-stage-hdr.s2 { background: #2563eb; }
+  .sv-stage-hdr.s3 { background: #7c3aed; }
+  .sv-stage-hdr.s4 { background: #16a34a; }
+
+  .sv-col-heads {
+    display: grid; grid-template-columns: 28px 1fr 110px 160px;
+    font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #888; background: #f8f8f8;
+    padding: 5px 10px; border-bottom: 1px solid #e8e8e8; gap: 0;
+  }
+
+  .sv-row {
+    display: grid; grid-template-columns: 28px 1fr 110px 160px;
+    gap: 0; padding: 6px 10px; border-bottom: 1px solid #eee;
+    background: #fff; align-items: start; transition: background 0.1s;
+  }
+  .sv-row:last-child { border-bottom: none; }
+  .sv-row.sv-checked { background: #f0fdf4; }
+  .sv-row.sv-rf-open { background: #fff5f5; }
+
+  .sv-status {
+    font-size: 0.65rem; font-weight: 800; padding: 2px 0; text-align: center;
+    border-radius: 3px; margin-top: 2px; white-space: nowrap;
+  }
+  .sv-status.done    { color: #166534; }
+  .sv-status.pending { color: #9ca3af; }
+  .sv-status.risk    { color: #dc2626; }
+
+  .sv-criterion { font-size: 0.78rem; color: #1a1a1a; line-height: 1.4; padding-right: 8px; }
+  .sv-criterion.crossed { text-decoration: line-through; color: #9ca3af; }
+
+  .sv-yn {
+    font-size: 0.75rem; font-weight: 700; text-align: center; padding-top: 2px;
+  }
+  .sv-yn.yes { color: #16a34a; }
+  .sv-yn.no  { color: #9ca3af; }
+
+  .sv-note { font-size: 0.74rem; color: #4b5563; font-style: italic; line-height: 1.35; }
+  .sv-note.empty { color: #d1d5db; }
+
+  .sv-subsection-hdr {
+    font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+    color: #6b7280; background: #f3f4f6; padding: 4px 10px 4px 38px;
+    border-bottom: 1px solid #e8e8e8; border-top: 1px solid #e8e8e8;
+  }
+
+  /* ── Quick View modal ── */
+  .qv-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+    overflow-y: auto; padding: 24px 16px;
+  }
+  .qv-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+  .qv-modal {
+    background: var(--white); border-radius: 12px; width: 100%; max-width: 820px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22); overflow: hidden;
+    animation: qv-in 0.18s ease;
+  }
+  @keyframes qv-in { from { opacity:0; transform:translateY(-12px); } to { opacity:1; transform:none; } }
+
+  .qv-head {
+    background: var(--charcoal); color: var(--white);
+    padding: 18px 22px; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  }
+  .qv-head-name { font-size: 1.2rem; font-weight: 800; letter-spacing: -0.01em; }
+  .qv-head-meta { font-size: 0.78rem; opacity: 0.7; margin-top: 3px; }
+  .qv-close {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: var(--white); border-radius: 6px; padding: 5px 13px; font-size: 0.8rem;
+    font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .qv-close:hover { background: rgba(255,255,255,0.25); }
+
+  .qv-stage-strip {
+    padding: 12px 22px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .qv-stage-name { font-size: 1rem; font-weight: 800; }
+  .qv-stage-pct  { font-size: 0.82rem; color: var(--muted); }
+
+  .qv-progress-bar { height: 6px; background: #eee; }
+  .qv-progress-fill { height: 100%; background: var(--orange); transition: width 0.4s; }
+
+  .qv-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  @media (max-width: 600px) { .qv-body { grid-template-columns: 1fr; } }
+
+  .qv-col { padding: 18px 20px; border-right: 1px solid var(--border); }
+  .qv-col:last-child { border-right: none; }
+  .qv-col-title {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 10px; padding-bottom: 6px; border-bottom: 2px solid var(--border);
+  }
+  .qv-col-title.green { color: #16a34a; border-color: #16a34a; }
+  .qv-col-title.amber { color: #d97706; border-color: #d97706; }
+
+  .qv-item {
+    font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid #f3f3f3;
+    display: flex; align-items: baseline; gap: 6px; line-height: 1.35;
+  }
+  .qv-item:last-child { border-bottom: none; }
+  .qv-item-dot { flex-shrink: 0; font-size: 0.65rem; }
+  .qv-item.done .qv-item-dot { color: #16a34a; }
+  .qv-item.open .qv-item-dot { color: #d97706; }
+  .qv-item.risk .qv-item-dot { color: #dc2626; }
+  .qv-note { font-size: 0.72rem; color: var(--muted); font-style: italic; margin-top: 1px; }
+  .qv-item-q {
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--muted); margin-bottom: 2px;
+  }
+  .qv-item.done .qv-note {
+    font-size: 0.82rem; font-style: normal; font-weight: 600;
+    color: var(--ink); margin-top: 2px;
+  }
+  .qv-empty { font-size: 0.8rem; color: #bbb; font-style: italic; padding: 6px 0; }
+
+  .qv-section { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .qv-section-title {
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+  .qv-actions-grid { display: flex; flex-direction: column; gap: 5px; }
+  .qv-action-row {
+    display: flex; align-items: baseline; gap: 8px; font-size: 0.8rem;
+    padding: 4px 0; border-bottom: 1px solid #f3f3f3;
+  }
+  .qv-action-row:last-child { border-bottom: none; }
+  .qv-action-status {
+    font-size: 0.65rem; font-weight: 700; padding: 1px 6px;
+    border-radius: 99px; white-space: nowrap; flex-shrink: 0;
+  }
+  .qv-action-status.open     { background: #fef3c7; color: #92400e; }
+  .qv-action-status.progress { background: #dbeafe; color: #1e3a8a; }
+  .qv-action-status.hold     { background: #f3f4f6; color: #6b7280; }
+  .qv-action-status.closed   { background: #dcfce7; color: #166534; }
+
+  .qv-notes-box {
+    font-size: 0.82rem; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px;
+    white-space: pre-wrap; line-height: 1.55;
+  }
+
+  /* ── Print ── */
+  @media print {
+    .save-bar, .add-btn, .remove-btn, .qv-overlay { display: none !important; }
+    .stage-body { display: block !important; }
+    body { background: white; }
+    .header { background: var(--charcoal) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  @media print {
+    body.sv-printing > *:not(#sv-overlay) { display: none !important; }
+    body.sv-printing #sv-overlay {
+      display: block !important; position: static !important;
+      background: none !important; padding: 0 !important;
+      overflow: visible !important;
+    }
+    body.sv-printing .sv-modal {
+      box-shadow: none !important; border-radius: 0 !important; max-width: 100% !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    body.sv-printing .sv-close,
+    body.sv-printing .sv-copy-btn,
+    body.sv-printing .sv-print-btn { display: none !important; }
+    body.sv-printing .sv-stage-hdr,
+    body.sv-printing .sv-col-heads { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <svg width="36" height="36" viewBox="0 0 38 38" fill="none">
+      <rect width="38" height="38" rx="6" fill="#E05206"/>
+      <text x="19" y="26" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="white" text-anchor="middle">V</text>
+    </svg>
+    <div>
+      <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;opacity:0.65;margin-bottom:1px;">VensureHR · UKG Ready</div>
+      <h1>Quick Assess — Enterprise HCM Opportunity Assessment</h1>
+    </div>
+  </div>
+  <p>Track deal stage, qualification criteria, and next steps across the full sales cycle.</p>
+</div>
+
+<div class="main">
+
+  <!-- Deal Header -->
+  <div class="deal-card">
+    <div class="deal-card-title">Deal Information</div>
+    <div class="deal-grid">
+      <div class="deal-field"><label for="dh-prospect">Prospect / Company Name</label><input type="text" id="dh-prospect" placeholder="Company name" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-website">Website</label><input type="text" id="dh-website" placeholder="www.example.com" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-bc">BC (Business Consultant)</label><input type="text" id="dh-bc" placeholder="BC name" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-sdr">SDR</label><input type="text" id="dh-sdr" placeholder="SDR name" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-ees">Number of EEs</label><input type="text" id="dh-ees" placeholder="e.g. 250" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-arr">Estimated ARR</label><input type="text" id="dh-arr" placeholder="e.g. $85,000" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-close">Target Close Date</label><input type="date" id="dh-close" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-sc">SC (Solutions Consultant)</label><input type="text" id="dh-sc" placeholder="SC name" oninput="updateAll()"></div>
+    </div>
+
+    <div class="deal-card-title" style="margin-top:16px;">BANT Qualification</div>
+    <div class="deal-grid">
+      <div class="deal-field"><label for="dh-bant-budget">Budget</label><input type="text" id="dh-bant-budget" placeholder="Budget range or status" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-bant-authority">Authority</label><input type="text" id="dh-bant-authority" placeholder="Decision maker / buying authority" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-bant-need">Need</label><input type="text" id="dh-bant-need" placeholder="Primary pain / business need" oninput="updateAll()"></div>
+      <div class="deal-field"><label for="dh-bant-timing">Timing</label><input type="text" id="dh-bant-timing" placeholder="Timeline / urgency driver" oninput="updateAll()"></div>
+    </div>
+
+    <div class="deal-card-title" style="margin-top:16px;">Current Tech Stack</div>
+    <div class="deal-grid">
+      <div class="deal-field"><label for="nts-s1_t1">Payroll Provider</label><input type="text" class="crit-input" id="nts-s1_t1-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t1','nts-s1_t1-di')"></div>
+      <div class="deal-field"><label for="nts-s1_t2-di">Time &amp; Attendance</label><input type="text" class="crit-input" id="nts-s1_t2-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t2','nts-s1_t2-di')"></div>
+      <div class="deal-field"><label for="nts-s1_t3-di">HR / HRIS</label><input type="text" class="crit-input" id="nts-s1_t3-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t3','nts-s1_t3-di')"></div>
+      <div class="deal-field"><label for="nts-s1_t4-di">ATS (Applicant Tracking)</label><input type="text" class="crit-input" id="nts-s1_t4-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t4','nts-s1_t4-di')"></div>
+      <div class="deal-field"><label for="nts-s1_t5-di">Talent / Perf / LMS</label><input type="text" class="crit-input" id="nts-s1_t5-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t5','nts-s1_t5-di')"></div>
+      <div class="deal-field"><label for="nts-s1_t6-di">Benefits Admin</label><input type="text" class="crit-input" id="nts-s1_t6-di" placeholder="Vendor name" oninput="syncDealInfo('nts-s1_t6','nts-s1_t6-di')"></div>
+    </div>
+
+    <div class="deal-card-title" style="margin-top:16px;">Buyer Personas</div>
+    <div class="deal-grid">
+      <div class="deal-field"><label for="nts-s1_p1-di">HR Director / CHRO</label><input type="text" class="crit-input" id="nts-s1_p1-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p1','nts-s1_p1-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p2-di">Payroll Manager</label><input type="text" class="crit-input" id="nts-s1_p2-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p2','nts-s1_p2-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p3-di">Benefits Administrator</label><input type="text" class="crit-input" id="nts-s1_p3-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p3','nts-s1_p3-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p4-di">Talent Acquisition / Recruiter</label><input type="text" class="crit-input" id="nts-s1_p4-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p4','nts-s1_p4-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p5-di">Talent Mgmt / L&amp;D</label><input type="text" class="crit-input" id="nts-s1_p5-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p5','nts-s1_p5-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p6-di">Performance / Comp Manager</label><input type="text" class="crit-input" id="nts-s1_p6-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p6','nts-s1_p6-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p7-di">IT Director</label><input type="text" class="crit-input" id="nts-s1_p7-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p7','nts-s1_p7-di')"></div>
+      <div class="deal-field"><label for="nts-s1_p8-di">CFO / Finance Lead</label><input type="text" class="crit-input" id="nts-s1_p8-di" placeholder="Name, title" oninput="syncDealInfo('nts-s1_p8','nts-s1_p8-di')"></div>
+    </div>
+  </div>
+  <div class="stage-section">
+    <button class="stage-toggle open" id="tgl-all" style="background:var(--charcoal);color:#fff;" onclick="toggleStage('all')">
+      <div class="stage-dot" style="font-size:1rem;">☰</div>
+      <div class="stage-toggle-title">
+        <div class="stage-toggle-name">Deal Qualification Checklist</div>
+        <div class="stage-toggle-sub">Stages 1–4 · Qualify · Develop · Prove · Negotiate</div>
+      </div>
+      <span class="stage-toggle-stats" id="stat-all"></span>
+      <span class="stage-chevron">▼</span>
+    </button>
+    <div class="stage-body open" id="body-all">
+
+      <!-- ── Stage 1: Qualify ── -->
+      <div class="stage-sub-hdr" style="background:var(--s1);color:#fff;">
+        <div class="stage-sub-hdr-dot">1</div>
+        <div class="stage-sub-hdr-title">
+          <div class="stage-sub-hdr-name">Stage 1 · Qualify</div>
+          <div class="stage-sub-hdr-sub">Initial Appointment (IA)</div>
+        </div>
+        <span class="stage-toggle-stats" id="stat-s1"></span>
+      </div>
+
+      <div class="sub-label">Prospect Research &amp; Setup</div>
+      <div class="crit-row" id="row-s1_r1"><input type="checkbox" class="crit-check" id="chk-s1_r1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_r1">Deal created in SFDC</span><input class="crit-input" id="nts-s1_r1" placeholder="Paste SFDC account URL →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_r1">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_r2"><input type="checkbox" class="crit-check" id="chk-s1_r2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_r2">Prospect website &amp; LinkedIn reviewed — ICP research complete</span><input class="crit-input" id="nts-s1_r2" placeholder="Key ICP fit observations →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_r2">Pending</span><span class="crit-owner">BC / SDR</span></div></div>
+
+      <div class="sub-label">Current Tech Stack — identify vendor for all 6 modules</div>
+      <div class="crit-row" id="row-s1_t1"><input type="checkbox" class="crit-check" id="chk-s1_t1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t1">Current Payroll Provider</span><input class="crit-input" id="nts-s1_t1" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t1">Pending</span><span class="crit-owner">Payroll Mgr</span></div></div>
+      <div class="crit-row" id="row-s1_t2"><input type="checkbox" class="crit-check" id="chk-s1_t2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t2">Current Time &amp; Attendance</span><input class="crit-input" id="nts-s1_t2" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t2">Pending</span><span class="crit-owner">Payroll Mgr</span></div></div>
+      <div class="crit-row" id="row-s1_t3"><input type="checkbox" class="crit-check" id="chk-s1_t3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t3">Current HR / HRIS</span><input class="crit-input" id="nts-s1_t3" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t3">Pending</span><span class="crit-owner">HR Dir.</span></div></div>
+      <div class="crit-row" id="row-s1_t4"><input type="checkbox" class="crit-check" id="chk-s1_t4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t4">Current ATS (Applicant Tracking)</span><input class="crit-input" id="nts-s1_t4" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t4">Pending</span><span class="crit-owner">TA Dir.</span></div></div>
+      <div class="crit-row" id="row-s1_t5"><input type="checkbox" class="crit-check" id="chk-s1_t5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t5">Current Talent (Perf / Comp / LMS)</span><input class="crit-input" id="nts-s1_t5" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t5">Pending</span><span class="crit-owner">L&amp;D / HR</span></div></div>
+      <div class="crit-row" id="row-s1_t6"><input type="checkbox" class="crit-check" id="chk-s1_t6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_t6">Current Benefits Admin</span><input class="crit-input" id="nts-s1_t6" placeholder="Vendor name →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_t6">Pending</span><span class="crit-owner">Ben. Admin</span></div></div>
+
+      <div class="sub-label">Essentials Qualification</div>
+      <div class="crit-row" id="row-s1_e1"><input type="checkbox" class="crit-check" id="chk-s1_e1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_e1">Budget identified / discussed (BANT)</span><input class="crit-input" id="nts-s1_e1" placeholder="Budget range / timing →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_e1">Pending</span><span class="crit-owner">CFO / BC</span></div></div>
+      <div class="crit-row" id="row-s1_e2"><input type="checkbox" class="crit-check" id="chk-s1_e2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_e2">Pending event identified (renewal, compliance, PEO exit, growth spike)</span><input class="crit-input" id="nts-s1_e2" placeholder="Event + date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_e2">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_e3"><input type="checkbox" class="crit-check" id="chk-s1_e3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_e3">Initial discovery complete — pain surfaced &amp; acknowledged by prospect</span><input class="crit-input" id="nts-s1_e3" placeholder="Key pain in their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_e3">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_e4"><input type="checkbox" class="crit-check" id="chk-s1_e4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_e4">Mutual action plan / committed next step</span><input class="crit-input" id="nts-s1_e4" placeholder="Agreed next step + date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_e4">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_e5"><input type="checkbox" class="crit-check" id="chk-s1_e5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_e5">Decision maker identified (name + title)</span><input class="crit-input" id="nts-s1_e5" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_e5">Pending</span><span class="crit-owner">BC</span></div></div>
+
+      <div class="sub-label">Initial Fit Assessment</div>
+      <div class="crit-row" id="row-s1_f1"><input type="checkbox" class="crit-check" id="chk-s1_f1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_f1">Can we meet functional requirements?</span><input class="crit-input" id="nts-s1_f1" placeholder="Note any known functional gaps →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_f1">Pending</span><span class="crit-owner">SE / BC</span></div></div>
+      <div class="crit-row" id="row-s1_f2"><input type="checkbox" class="crit-check" id="chk-s1_f2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_f2">Desired go-live date known &amp; achievable?</span><input class="crit-input" id="nts-s1_f2" placeholder="Target live date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_f2">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_f3"><input type="checkbox" class="crit-check" id="chk-s1_f3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_f3">Is this an HR-driven decision?</span><input class="crit-input" id="nts-s1_f3" placeholder="If not — note who is driving and why →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_f3">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s1_f4"><input type="checkbox" class="crit-check" id="chk-s1_f4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_f4">Segment identified (SMB / Mid-Market / Enterprise / Vertical)</span><input class="crit-input" id="nts-s1_f4" placeholder="Segment + vertical e.g. Cannabis →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_f4">Pending</span><span class="crit-owner">BC</span></div></div>
+
+      <div class="sub-label">Buyer Personas Identified — name + title for each</div>
+      <div class="crit-row" id="row-s1_p1"><input type="checkbox" class="crit-check" id="chk-s1_p1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p1">HR Director / CHRO identified</span><input class="crit-input" id="nts-s1_p1" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p1">Pending</span><span class="crit-owner">HR</span></div></div>
+      <div class="crit-row" id="row-s1_p2"><input type="checkbox" class="crit-check" id="chk-s1_p2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p2">Payroll Manager / PR identified</span><input class="crit-input" id="nts-s1_p2" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p2">Pending</span><span class="crit-owner">Payroll</span></div></div>
+      <div class="crit-row" id="row-s1_p3"><input type="checkbox" class="crit-check" id="chk-s1_p3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p3">Benefits Administrator identified</span><input class="crit-input" id="nts-s1_p3" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p3">Pending</span><span class="crit-owner">Benefits</span></div></div>
+      <div class="crit-row" id="row-s1_p4"><input type="checkbox" class="crit-check" id="chk-s1_p4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p4">Talent Acquisition / Recruiter identified</span><input class="crit-input" id="nts-s1_p4" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p4">Pending</span><span class="crit-owner">TA</span></div></div>
+      <div class="crit-row" id="row-s1_p5"><input type="checkbox" class="crit-check" id="chk-s1_p5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p5">Talent Mgmt / L&amp;D identified</span><input class="crit-input" id="nts-s1_p5" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p5">Pending</span><span class="crit-owner">Talent</span></div></div>
+      <div class="crit-row" id="row-s1_p6"><input type="checkbox" class="crit-check" id="chk-s1_p6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p6">Performance / Comp Manager identified</span><input class="crit-input" id="nts-s1_p6" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p6">Pending</span><span class="crit-owner">Perf/Comp</span></div></div>
+      <div class="crit-row" id="row-s1_p7"><input type="checkbox" class="crit-check" id="chk-s1_p7" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p7">IT Director identified</span><input class="crit-input" id="nts-s1_p7" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p7">Pending</span><span class="crit-owner">IT</span></div></div>
+      <div class="crit-row" id="row-s1_p8"><input type="checkbox" class="crit-check" id="chk-s1_p8" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s1_p8">CFO / Finance lead identified</span><input class="crit-input" id="nts-s1_p8" placeholder="Name, title →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s1_p8">Pending</span><span class="crit-owner">Finance</span></div></div>
+
+      <!-- ── Stage 2: Develop ── -->
+      <div class="stage-sub-hdr" style="background:var(--s2);color:#fff;">
+        <div class="stage-sub-hdr-dot">2</div>
+        <div class="stage-sub-hdr-title">
+          <div class="stage-sub-hdr-name">Stage 2 · Develop</div>
+          <div class="stage-sub-hdr-sub">Diagnostic (Discovery)</div>
+        </div>
+        <span class="stage-toggle-stats" id="stat-s2"></span>
+      </div>
+
+      <div class="sub-label">Buyer Influencer Wins — capture in THEIR words</div>
+      <div class="crit-row" id="row-s2_w1"><input type="checkbox" class="crit-check" id="chk-s2_w1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w1">HR win identified &amp; articulated in prospect's words</span><input class="crit-input" id="nts-s2_w1" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w1">Pending</span><span class="crit-owner">HR Dir.</span></div></div>
+      <div class="crit-row" id="row-s2_w2"><input type="checkbox" class="crit-check" id="chk-s2_w2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w2">Payroll / PR win identified &amp; articulated in prospect's words</span><input class="crit-input" id="nts-s2_w2" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w2">Pending</span><span class="crit-owner">PR Mgr</span></div></div>
+      <div class="crit-row" id="row-s2_w3"><input type="checkbox" class="crit-check" id="chk-s2_w3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w3">Benefits win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w3" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w3">Pending</span><span class="crit-owner">Ben. Admin</span></div></div>
+      <div class="crit-row" id="row-s2_w4"><input type="checkbox" class="crit-check" id="chk-s2_w4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w4">Recruitment / TA win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w4" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w4">Pending</span><span class="crit-owner">TA Dir.</span></div></div>
+      <div class="crit-row" id="row-s2_w5"><input type="checkbox" class="crit-check" id="chk-s2_w5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w5">Talent / L&amp;D win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w5" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w5">Pending</span><span class="crit-owner">L&amp;D</span></div></div>
+      <div class="crit-row" id="row-s2_w6"><input type="checkbox" class="crit-check" id="chk-s2_w6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w6">Performance / Comp win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w6" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w6">Pending</span><span class="crit-owner">Perf/Comp</span></div></div>
+      <div class="crit-row" id="row-s2_w7"><input type="checkbox" class="crit-check" id="chk-s2_w7" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w7">IT / Technical win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w7" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w7">Pending</span><span class="crit-owner">IT Dir.</span></div></div>
+      <div class="crit-row" id="row-s2_w8"><input type="checkbox" class="crit-check" id="chk-s2_w8" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_w8">CFO / Finance win identified &amp; articulated</span><input class="crit-input" id="nts-s2_w8" placeholder="Their words →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_w8">Pending</span><span class="crit-owner">CFO</span></div></div>
+
+      <div class="sub-label">Enterprise Value Proposition Validation</div>
+      <div class="crit-row" id="row-s2_v1"><input type="checkbox" class="crit-check" id="chk-s2_v1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v1">Mobile access / employee self-service validated</span><input class="crit-input" id="nts-s2_v1" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v1">Pending</span><span class="crit-owner">HR / Empl.</span></div></div>
+      <div class="crit-row" id="row-s2_v2"><input type="checkbox" class="crit-check" id="chk-s2_v2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v2">Onboarding workflow validated</span><input class="crit-input" id="nts-s2_v2" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v2">Pending</span><span class="crit-owner">HR</span></div></div>
+      <div class="crit-row" id="row-s2_v3"><input type="checkbox" class="crit-check" id="chk-s2_v3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v3">Communications / announcements validated</span><input class="crit-input" id="nts-s2_v3" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v3">Pending</span><span class="crit-owner">HR</span></div></div>
+      <div class="crit-row" id="row-s2_v4"><input type="checkbox" class="crit-check" id="chk-s2_v4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v4">Integrated suite (single platform) value validated</span><input class="crit-input" id="nts-s2_v4" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v4">Pending</span><span class="crit-owner">CHRO / CFO</span></div></div>
+      <div class="crit-row" id="row-s2_v5"><input type="checkbox" class="crit-check" id="chk-s2_v5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v5">Service model &amp; implementation approach validated</span><input class="crit-input" id="nts-s2_v5" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v5">Pending</span><span class="crit-owner">BC / Impl.</span></div></div>
+      <div class="crit-row" id="row-s2_v6"><input type="checkbox" class="crit-check" id="chk-s2_v6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v6">UKG Ready differentiator 1 validated</span><input class="crit-input desc" id="dsc-s2_v6" placeholder="Differentiator name →" oninput="updateAll()"><input class="crit-input" id="nts-s2_v6" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v6">Pending</span><span class="crit-owner">SE / BC</span></div></div>
+      <div class="crit-row" id="row-s2_v7"><input type="checkbox" class="crit-check" id="chk-s2_v7" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s2_v7">UKG Ready differentiator 2 validated</span><input class="crit-input desc" id="dsc-s2_v7" placeholder="Differentiator name →" oninput="updateAll()"><input class="crit-input" id="nts-s2_v7" placeholder="Their response →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_v7">Pending</span><span class="crit-owner">SE / BC</span></div></div>
+
+      <div class="sub-label">Key Strengths — competitive advantages in this deal (check when validated with prospect)</div>
+      <div class="crit-row" id="row-s2_s1"><input type="checkbox" class="crit-check" id="chk-s2_s1" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_s1" placeholder="Describe strength →" oninput="updateAll()"><input class="crit-input" id="nts-s2_s1" placeholder="Validation plan / evidence →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_s1">Pending</span></div></div>
+      <div class="crit-row" id="row-s2_s2"><input type="checkbox" class="crit-check" id="chk-s2_s2" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_s2" placeholder="Describe strength →" oninput="updateAll()"><input class="crit-input" id="nts-s2_s2" placeholder="Validation plan / evidence →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_s2">Pending</span></div></div>
+      <div class="crit-row" id="row-s2_s3"><input type="checkbox" class="crit-check" id="chk-s2_s3" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_s3" placeholder="Describe strength →" oninput="updateAll()"><input class="crit-input" id="nts-s2_s3" placeholder="Validation plan / evidence →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_s3">Pending</span></div></div>
+      <div class="crit-row" id="row-s2_s4"><input type="checkbox" class="crit-check" id="chk-s2_s4" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_s4" placeholder="Describe strength →" oninput="updateAll()"><input class="crit-input" id="nts-s2_s4" placeholder="Validation plan / evidence →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_s4">Pending</span></div></div>
+      <div class="crit-row" id="row-s2_s5"><input type="checkbox" class="crit-check" id="chk-s2_s5" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_s5" placeholder="Describe strength →" oninput="updateAll()"><input class="crit-input" id="nts-s2_s5" placeholder="Validation plan / evidence →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s2_s5">Pending</span></div></div>
+
+      <div class="sub-label">Key Red Flags — deal risks requiring mitigation (check when fully mitigated)</div>
+      <div class="crit-row" id="row-s2_rf1"><input type="checkbox" class="crit-check" id="chk-s2_rf1" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_rf1" placeholder="Describe red flag →" oninput="updateAll()"><input class="crit-input" id="nts-s2_rf1" placeholder="Mitigation plan →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-risk" id="bdg-s2_rf1">⚠ Open</span></div></div>
+      <div class="crit-row" id="row-s2_rf2"><input type="checkbox" class="crit-check" id="chk-s2_rf2" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_rf2" placeholder="Describe red flag →" oninput="updateAll()"><input class="crit-input" id="nts-s2_rf2" placeholder="Mitigation plan →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-risk" id="bdg-s2_rf2">⚠ Open</span></div></div>
+      <div class="crit-row" id="row-s2_rf3"><input type="checkbox" class="crit-check" id="chk-s2_rf3" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_rf3" placeholder="Describe red flag →" oninput="updateAll()"><input class="crit-input" id="nts-s2_rf3" placeholder="Mitigation plan →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-risk" id="bdg-s2_rf3">⚠ Open</span></div></div>
+      <div class="crit-row" id="row-s2_rf4"><input type="checkbox" class="crit-check" id="chk-s2_rf4" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_rf4" placeholder="Describe red flag →" oninput="updateAll()"><input class="crit-input" id="nts-s2_rf4" placeholder="Mitigation plan →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-risk" id="bdg-s2_rf4">⚠ Open</span></div></div>
+      <div class="crit-row" id="row-s2_rf5"><input type="checkbox" class="crit-check" id="chk-s2_rf5" onchange="updateAll()"><div class="crit-main"><input class="crit-input desc" id="dsc-s2_rf5" placeholder="Describe red flag →" oninput="updateAll()"><input class="crit-input" id="nts-s2_rf5" placeholder="Mitigation plan →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-risk" id="bdg-s2_rf5">⚠ Open</span></div></div>
+
+      <!-- ── Stage 3: Prove ── -->
+      <div class="stage-sub-hdr" style="background:var(--s3);color:#fff;">
+        <div class="stage-sub-hdr-dot">3</div>
+        <div class="stage-sub-hdr-title">
+          <div class="stage-sub-hdr-name">Stage 3 · Prove</div>
+          <div class="stage-sub-hdr-sub">Demonstration(s) — 70% win rate at this stage</div>
+        </div>
+        <span class="stage-toggle-stats" id="stat-s3"></span>
+      </div>
+
+      <div class="sub-label">Demonstration Validation Checklist</div>
+      <div class="crit-row" id="row-s3_d1"><input type="checkbox" class="crit-check" id="chk-s3_d1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d1">Demoed to ALL key stakeholder personas</span><input class="crit-input" id="nts-s3_d1" placeholder="List any persona not yet demoed →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d1">Pending</span><span class="crit-owner">BC / SE</span></div></div>
+      <div class="crit-row" id="row-s3_d2"><input type="checkbox" class="crit-check" id="chk-s3_d2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d2">All open items &amp; red flags from Develop addressed</span><input class="crit-input" id="nts-s3_d2" placeholder="List any unresolved items →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d2">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s3_d3"><input type="checkbox" class="crit-check" id="chk-s3_d3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d3">Payroll / Time requirement gaps reviewed &amp; resolved</span><input class="crit-input" id="nts-s3_d3" placeholder="No gaps — OR — gaps documented &amp; mitigated →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d3">Pending</span><span class="crit-owner">SE / PR</span></div></div>
+      <div class="crit-row" id="row-s3_d4"><input type="checkbox" class="crit-check" id="chk-s3_d4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d4">HCM (HR / Benefits / Talent) requirement gaps reviewed &amp; resolved</span><input class="crit-input" id="nts-s3_d4" placeholder="No gaps — OR — gaps documented &amp; mitigated →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d4">Pending</span><span class="crit-owner">SE / HR</span></div></div>
+      <div class="crit-row" id="row-s3_d5"><input type="checkbox" class="crit-check" id="chk-s3_d5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d5">Price is in-line with budget</span><input class="crit-input" id="nts-s3_d5" placeholder="Note delta if exists →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d5">Pending</span><span class="crit-owner">BC / CFO</span></div></div>
+      <div class="crit-row" id="row-s3_d6"><input type="checkbox" class="crit-check" id="chk-s3_d6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d6">References offered and scheduled / completed</span><input class="crit-input" id="nts-s3_d6" placeholder="Reference names &amp; match to prospect profile →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d6">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s3_d7"><input type="checkbox" class="crit-check" id="chk-s3_d7" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d7">Champion tested (describe the test in notes — required)</span><input class="crit-input" id="nts-s3_d7" placeholder="What did they share / arrange / advocate? →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d7">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s3_d8"><input type="checkbox" class="crit-check" id="chk-s3_d8" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s3_d8">Incumbent vendor notification period confirmed (contract termination)</span><input class="crit-input" id="nts-s3_d8" placeholder="Notice period required + contract end date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s3_d8">Pending</span><span class="crit-owner">BC</span></div></div>
+
+      <!-- ── Stage 4: Negotiate ── -->
+      <div class="stage-sub-hdr" style="background:var(--s4);color:#fff;">
+        <div class="stage-sub-hdr-dot">4</div>
+        <div class="stage-sub-hdr-title">
+          <div class="stage-sub-hdr-name">Stage 4 · Negotiate</div>
+          <div class="stage-sub-hdr-sub">Finalist Process / Close / Contracting</div>
+        </div>
+        <span class="stage-toggle-stats" id="stat-s4"></span>
+      </div>
+
+      <div class="sub-label">Verbal Stage — Commercial &amp; Legal Checklist</div>
+      <div class="crit-row" id="row-s4_c1"><input type="checkbox" class="crit-check" id="chk-s4_c1" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c1">Final decision process &amp; date confirmed</span><input class="crit-input" id="nts-s4_c1" placeholder="Decision date + all remaining steps →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c1">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s4_c2"><input type="checkbox" class="crit-check" id="chk-s4_c2" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c2">Final proposal presented to Economic Buyer (not only through champion)</span><input class="crit-input" id="nts-s4_c2" placeholder="Presented to: name + date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c2">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s4_c3"><input type="checkbox" class="crit-check" id="chk-s4_c3" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c3">Contract presented to procurement / legal</span><input class="crit-input" id="nts-s4_c3" placeholder="Sent to: name + date →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c3">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s4_c4"><input type="checkbox" class="crit-check" id="chk-s4_c4" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c4">Contract review process &amp; timeline known</span><input class="crit-input" id="nts-s4_c4" placeholder="Who reviews / who signs / expected turnaround →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c4">Pending</span><span class="crit-owner">BC</span></div></div>
+      <div class="crit-row" id="row-s4_c5"><input type="checkbox" class="crit-check" id="chk-s4_c5" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c5">Implementation Manager introduced to key contacts pre-signature</span><input class="crit-input" id="nts-s4_c5" placeholder="Intro confirmed with: →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c5">Pending</span><span class="crit-owner">BC / Impl.</span></div></div>
+      <div class="crit-row" id="row-s4_c6"><input type="checkbox" class="crit-check" id="chk-s4_c6" onchange="updateAll()"><div class="crit-main"><span class="crit-text" id="txt-s4_c6">All sales-cycle commitments reflected in contract / attached</span><input class="crit-input" id="nts-s4_c6" placeholder="Note any custom commitments made during the deal →" oninput="updateAll()"></div><div class="crit-right"><span class="status-badge badge-pending" id="bdg-s4_c6">Pending</span><span class="crit-owner">BC</span></div></div>
+
+    </div>
+  </div>
+
+
+
+
+  <!-- ── OPEN ITEMS (inline) ──────────────────────────────────────────────── -->
+  <div class="stage-section" style="margin-bottom:16px;">
+    <button class="stage-toggle open" id="tgl-openitems" style="background:#0f766e;color:#fff;" onclick="toggleStage('openitems')">
+      <div class="stage-dot" style="font-size:1rem;">📋</div>
+      <div class="stage-toggle-title">
+        <div class="stage-toggle-name">Open Items</div>
+        <div class="stage-toggle-sub">What We Know · Still Need to ID · Open Red Flags</div>
+      </div>
+      <span class="stage-chevron">▼</span>
+    </button>
+    <div class="stage-body open" id="body-openitems" style="padding:0;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:none;">
+        <div style="padding:14px 16px;border-right:1px solid #f0f0f0;">
+          <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#16a34a;margin-bottom:10px;">✓ What We Know</div>
+          <div id="oi-know"></div>
+        </div>
+        <div style="padding:14px 16px;">
+          <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#d97706;margin-bottom:10px;">⚠ Still Need to ID</div>
+          <div id="oi-need"></div>
+        </div>
+      </div>
+      <div id="oi-rf-section" style="display:none;border-top:1px solid #f0f0f0;padding:14px 16px;">
+        <div style="font-size:0.68rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#dc2626;margin-bottom:10px;">🚩 Open Red Flags</div>
+        <div id="oi-redflags" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── IA ANALYSIS ───────────────────────────────────────────────────────── -->
+  <div class="stage-section">
+    <button class="stage-toggle open" id="tgl-ia" style="background:#1e40af;color:#fff;" onclick="toggleStage('ia')">
+      <div class="stage-dot" style="font-size:1rem;">🤝</div>
+      <div class="stage-toggle-title">
+        <div class="stage-toggle-name">IA Analysis</div>
+        <div class="stage-toggle-sub">Initial Appointment — prospect goals, positive signals, objections &amp; concerns</div>
+      </div>
+      <span class="stage-chevron">▼</span>
+    </button>
+    <div class="stage-body open" id="body-ia" style="padding:16px 20px;">
+
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">Paste the IA transcript below. AI will extract prospect goals, and categorize their comments into positive signals, objections, and items needing follow-up — using their actual words.</div>
+      <div class="ia-input-row">
+        <textarea class="ia-textarea" id="ia-transcript" placeholder="Paste, drag &amp; drop, or load a .txt file — Initial Appointment transcript (Zoom, Teams, Gong, or any call notes)…"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button class="ia-run-btn" id="ia-run-btn" onclick="runIAAndExtract()">🔍 Analyze IA</button>
+        </div>
+      </div>
+      <div class="ia-status" id="ia-status"></div>
+
+      <div class="ia-results" id="ia-results">
+        <div class="ia-summary" id="ia-summary"></div>
+        <div class="ia-card goals" style="margin-bottom:16px;">
+          <div class="ia-card-head">🎯 Prospect Project Goals</div>
+          <div class="ia-card-body" id="ia-goals-body"></div>
+        </div>
+        <div class="ia-grid" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="ia-card positive">
+            <div class="ia-card-head">✅ Positive Comments</div>
+            <div class="ia-card-body" id="ia-positive-body"></div>
+          </div>
+          <div class="ia-card negative">
+            <div class="ia-card-head">❌ Objections / Negatives</div>
+            <div class="ia-card-body" id="ia-negative-body"></div>
+          </div>
+          <div class="ia-card concerns">
+            <div class="ia-card-head">⚠️ Concerns / Follow-Ups</div>
+            <div class="ia-card-body" id="ia-concerns-body"></div>
+          </div>
+        </div>
+        <div class="ia-timestamp" id="ia-timestamp"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── DIAGNOSTIC ANALYSIS ────────────────────────────────────────────────── -->
+  <div class="stage-section">
+    <button class="stage-toggle open" id="tgl-diag" style="background:#0f766e;color:#fff;" onclick="toggleStage('diag')">
+      <div class="stage-dot" style="font-size:1rem;">🔬</div>
+      <div class="stage-toggle-title">
+        <div class="stage-toggle-name">Diagnostic Analysis</div>
+        <div class="stage-toggle-sub">Discovery meeting — prospect comments by HCM functional area</div>
+      </div>
+      <span class="stage-chevron">▼</span>
+    </button>
+    <div class="stage-body open" id="body-diag" style="padding:16px 20px;">
+
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">Paste the Diagnostic (Discovery) transcript below. AI will summarize the prospect's comments — using their actual words — across each HCM functional area.</div>
+      <div class="ia-input-row">
+        <textarea class="ia-textarea" id="diag-transcript" placeholder="Paste, drag &amp; drop, or load a .txt file — Diagnostic / Discovery transcript…"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button class="ia-run-btn" id="diag-run-btn" onclick="runDiagnosticAndExtract()">🔍 Analyze Diagnostic</button>
+        </div>
+      </div>
+      <div class="ia-status" id="diag-status"></div>
+
+      <div class="ia-results" id="diag-results">
+        <div class="diag-summary-box" id="diag-summary"></div>
+        <div class="diag-module-grid" id="diag-module-grid"></div>
+        <div class="ia-timestamp" id="diag-timestamp"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── DEMO ANALYSIS ──────────────────────────────────────────────────────── -->
+  <div class="stage-section">
+    <button class="stage-toggle open" id="tgl-demo" style="background:#7c3aed;color:#fff;" onclick="toggleStage('demo')">
+      <div class="stage-dot" style="font-size:1rem;">🎬</div>
+      <div class="stage-toggle-title">
+        <div class="stage-toggle-name">Demo Analysis</div>
+        <div class="stage-toggle-sub">Demo meeting — reactions by functional area, open items &amp; follow-ups</div>
+      </div>
+      <span class="stage-chevron">▼</span>
+    </button>
+    <div class="stage-body open" id="body-demo" style="padding:16px 20px;">
+
+      <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px;">Paste the demo meeting transcript below. AI extracts the prospect's reactions by functional area — positive, negative, and neutral — plus all open items, follow-up commitments, and off-topic questions from the session.</div>
+      <div class="ia-input-row">
+        <textarea class="ia-textarea" id="demo-transcript" placeholder="Paste, drag &amp; drop, or load a .txt file — Demo meeting transcript…"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button class="ia-run-btn" id="demo-run-btn" onclick="runDemoAndExtract()">🔍 Analyze Demo</button>
+        </div>
+      </div>
+      <div class="ia-status" id="demo-status"></div>
+
+      <div class="ia-results" id="demo-results">
+        <div class="diag-summary-box" id="demo-summary"></div>
+        <div id="demo-areas"></div>
+        <div class="demo-open-wrap" id="demo-open-wrap" style="display:none;">
+          <div class="demo-open-head">📋 Open Items Summary</div>
+          <div class="demo-open-section" id="demo-unanswered-sec" style="display:none;">
+            <div class="demo-open-label unanswered">❌ Unanswered Questions</div>
+            <div id="demo-unanswered"></div>
+          </div>
+          <div class="demo-open-section" id="demo-answered-sec" style="display:none;">
+            <div class="demo-open-label answered">✅ Answered During Meeting</div>
+            <div id="demo-answered"></div>
+          </div>
+          <div class="demo-open-section" id="demo-followup-sec" style="display:none;">
+            <div class="demo-open-label followup">📌 Designated Follow-Ups</div>
+            <div id="demo-followup"></div>
+          </div>
+        </div>
+        <div class="demo-open-wrap" id="demo-other-wrap" style="display:none;">
+          <div class="demo-open-head">💬 Other — Non-Product Comments</div>
+          <div class="demo-open-section">
+            <div id="demo-other"></div>
+          </div>
+        </div>
+        <div class="ia-timestamp" id="demo-timestamp"></div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ── AI ACTION ITEMS ───────────────────────────────────────────────────── -->
+  <div class="ai-actions-wrap">
+    <div class="ai-actions-head">
+      <h2>✅ Action Items</h2>
+      <div class="ai-actions-tabs">
+        <button class="ai-actions-tab active" onclick="setAIActionsTab('all')"    id="aitab-all">All Open</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('ia')"     id="aitab-ia">IA</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('diagnostic')" id="aitab-diagnostic">Diagnostic</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('demo')"   id="aitab-demo">Demo</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('email')"  id="aitab-email">Email</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('manual')" id="aitab-manual">Manual</button>
+        <button class="ai-actions-tab"        onclick="setAIActionsTab('done')"   id="aitab-done">Closed</button>
+      </div>
+    </div>
+    <div class="ai-actions-body">
+
+      <!-- Email input to close items -->
+      <div class="ai-email-strip">
+        <div class="ai-email-label">📧 Paste Email — Close Action Items</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">AI will match email content against open items and mark resolved ones as closed.</div>
+        <div class="ai-email-row">
+          <textarea class="ia-textarea" id="ai-email-text" style="min-height:70px;" placeholder="Paste an email thread, reply, or forwarded message here…"></textarea>
+          <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+            <button class="ia-run-btn" id="ai-email-btn" onclick="runEmailParse()" style="background:#7c3aed;">📧 Parse Email</button>
+          </div>
+        </div>
+        <div class="ai-email-status" id="ai-email-status"></div>
+      </div>
+
+      <!-- Action items list -->
+      <div id="ai-actions-list"></div>
+
+      <!-- Manual add bar -->
+      <div class="ai-actions-add-bar">
+        <input type="text" class="ai-actions-add-input" id="ai-action-add-input"
+          placeholder="Add a manual action item…" onkeydown="if(event.key==='Enter')addManualAIAction()">
+        <select id="ai-action-add-owner" style="font-size:0.8rem;padding:7px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;">
+          <option value="">Owner</option>
+          <option>BC</option><option>SE</option><option>SDR</option>
+          <option>Prospect</option><option>SC</option><option>Team</option>
+        </select>
+        <button class="ai-actions-add-btn" onclick="addManualAIAction()">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-wrap" style="display:none;">
+    <div id="action-rows"></div>
+  </div>
+
+  <!-- ── SAVE ─────────────────────────────────────────────────────────────── -->
+  <div class="save-wrap">
+    <div class="notes-area">
+      <label class="notes-label" for="seller-notes">Seller Notes</label>
+      <textarea class="notes-ta" id="seller-notes" placeholder="Overall deal notes, context, next steps..." oninput="updateAll()"></textarea>
+    </div>
+
+    <!-- Upload strip -->
+    <div class="upload-strip">
+      <div class="upload-strip-label">
+        <span>🤖 AI Import</span>
+        <span class="upload-hint">Paste a meeting transcript or upload a .docx — AI extracts and updates the form</span>
+      </div>
+      <div class="upload-strip-right">
+        <button class="upload-btn" onclick="openTranscriptModal()" style="background:#1e3a5f;">📋 Paste Transcript</button>
+        <label class="upload-btn" for="doc-upload">📄 Upload .docx</label>
+        <input type="file" id="doc-upload" accept=".docx" style="display:none" onchange="handleDocUpload(this)">
+      </div>
+    </div>
+    <div class="upload-status" id="upload-status" style="display:none;"></div>
+
+    <div class="save-bar">
+      <button class="save-btn sv" onclick="openSheetView()" style="background:#1e3a5f;color:#fff;">👁 Quick View</button>
+      <button class="save-btn" onclick="saveDeal()" style="background:#7c3aed;color:#fff;">💾 Save Deal</button>
+      <button class="save-btn" onclick="openMyDeals()" style="background:#374151;color:#fff;">📁 My Deals</button>
+      <button class="save-btn copy" onclick="openSheetView();setTimeout(svCopySummary,200)">📋 Copy Summary</button>
+      <button class="save-btn pdf"  onclick="openSheetView();setTimeout(svPrint,200)">🖨 Save as PDF</button>
+      <button class="save-btn link" onclick="copyLink()">🔗 Copy Link</button>
+      <span class="copy-confirm" id="copy-confirm"></span>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── MY DEALS MODAL ────────────────────────────────────────────────────── -->
+<div class="md-overlay" id="md-overlay" onclick="handleMDOverlay(event)">
+  <div class="md-modal">
+    <div class="ak-head">
+      <div>
+        <div style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">📁 My Deals</div>
+        <div style="font-size:0.75rem;opacity:0.7;margin-top:3px;">Saved in this browser — click any deal to open it</div>
+      </div>
+      <button class="qv-close" onclick="closeMyDeals()">✕</button>
+    </div>
+    <div id="md-list"></div>
+    <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+      <button onclick="closeMyDeals()" style="padding:7px 18px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── API KEY MODAL ─────────────────────────────────────────────────────── -->
+<div class="ak-overlay" id="ak-overlay" onclick="handleAKOverlay(event)">
+  <div class="ak-modal">
+    <div class="ak-head">
+      <div>
+        <div style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">OpenAI API Key</div>
+        <div style="font-size:0.75rem;opacity:0.7;margin-top:3px;">Stored locally in your browser only — never sent anywhere except OpenAI</div>
+      </div>
+      <button class="qv-close" onclick="closeApiKeyModal()">✕</button>
+    </div>
+    <div style="padding:20px;">
+      <input type="password" id="ak-input" placeholder="sk-..." style="width:100%;font-size:0.9rem;padding:9px 12px;border:1px solid var(--border);border-radius:6px;font-family:inherit;margin-bottom:12px;">
+      <div style="display:flex;gap:10px;">
+        <button onclick="saveApiKey()" style="flex:1;padding:9px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Save Key</button>
+        <button onclick="clearApiKey()" style="padding:9px 16px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Clear</button>
+      </div>
+      <div id="ak-status" style="font-size:0.78rem;color:#16a34a;margin-top:10px;min-height:18px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TRANSCRIPT PASTE MODAL ─────────────────────────────────────────────── -->
+<div class="ai-overlay" id="transcript-overlay" onclick="handleTranscriptOverlay(event)">
+  <div class="ai-modal" style="max-width:700px;">
+    <div class="ak-head">
+      <div>
+        <div style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">📋 Paste Meeting Transcript</div>
+        <div style="font-size:0.75rem;opacity:0.7;margin-top:3px;">Paste any transcript, call notes, or email thread — AI will extract and update the form</div>
+      </div>
+      <button class="qv-close" onclick="closeTranscriptModal()">✕</button>
+    </div>
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);">
+      <textarea id="transcript-text" style="width:100%;height:220px;font-size:0.82rem;font-family:inherit;padding:10px;border:1px solid var(--border);border-radius:6px;resize:vertical;color:var(--ink);" placeholder="Paste your Zoom, Teams, Gong transcript, email thread, or call notes here..."></textarea>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:16px;font-size:0.8rem;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+          <input type="radio" name="ai-import-mode" id="mode-merge" value="merge" checked> 
+          <span>🔀 Merge <span style="font-weight:400;color:var(--muted)">(append new info, keep existing)</span></span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:600;">
+          <input type="radio" name="ai-import-mode" id="mode-replace" value="replace"> 
+          <span>🔄 Replace <span style="font-weight:400;color:var(--muted)">(overwrite with new data)</span></span>
+        </label>
+      </div>
+    </div>
+    <div style="padding:12px 20px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--border);background:#fafafa;">
+      <button onclick="closeTranscriptModal()" style="padding:8px 18px;background:#f3f4f6;border:1px solid #d1d5db;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+      <button onclick="handleTranscriptSubmit()" style="padding:8px 20px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">🤖 Analyze Transcript</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── AI REVIEW MODAL ────────────────────────────────────────────────────── -->
+<div class="ai-overlay" id="ai-overlay">
+  <div class="ai-modal">
+    <div class="ak-head">
+      <div>
+        <div style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">🤖 AI Import Review</div>
+        <div style="font-size:0.75rem;opacity:0.7;margin-top:3px;" id="ai-filename"></div>
+      </div>
+      <button class="qv-close" onclick="closeAiModal()">✕</button>
+    </div>
+    <div style="padding:16px 20px;font-size:0.8rem;color:var(--muted);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <span>Review what the AI found. Uncheck anything you don't want to apply, then click Apply.</span>
+      <span id="ai-mode-badge" style="font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap;background:#dbeafe;color:#1e3a8a;">🔀 Merge Mode</span>
+    </div>
+    <div id="ai-results" style="max-height:55vh;overflow-y:auto;padding:0;"></div>
+    <div style="padding:14px 20px;display:flex;gap:10px;border-top:1px solid var(--border);">
+      <button onclick="applyAiResults()" style="flex:1;padding:10px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">✓ Apply to Form</button>
+      <button onclick="closeAiModal()" style="padding:10px 18px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SHEET VIEW MODAL ───────────────────────────────────────────────────── -->
+<div class="sv-overlay" id="sv-overlay" onclick="handleSVOverlayClick(event)">
+  <div class="sv-modal" id="sv-modal">
+    <div class="sv-head">
+      <div class="sv-head-left">
+        <div class="sv-title">QUICK ASSESS &nbsp;|&nbsp; Enterprise HCM &nbsp;|&nbsp; Opportunity Assessment</div>
+        <div class="sv-subtitle" id="sv-subtitle"></div>
+      </div>
+      <div class="sv-head-right">
+        <div class="sv-stage-chip" id="sv-stage-chip"></div>
+        <button class="sv-copy-btn" onclick="svCopySummary()">📋 Copy</button>
+        <button class="sv-print-btn" onclick="svPrint()">🖨 PDF</button>
+        <button class="sv-close" onclick="closeSheetView()">✕</button>
+      </div>
+    </div>
+    <div class="sv-body" id="sv-body"></div>
+  </div>
+</div>
+
+<!-- ── QUICK VIEW MODAL ──────────────────────────────────────────────────── -->
+<div class="qv-overlay" id="qv-overlay" onclick="handleOverlayClick(event)">
+  <div class="qv-modal" id="qv-modal">
+    <div class="qv-head">
+      <div>
+        <div class="qv-head-name" id="qv-name">—</div>
+        <div class="qv-head-meta" id="qv-meta"></div>
+      </div>
+      <button class="qv-close" onclick="closeQuickView()">✕ Close</button>
+    </div>
+    <div class="qv-stage-strip">
+      <div class="qv-stage-name" id="qv-stage-name"></div>
+      <div class="qv-stage-pct"  id="qv-stage-pct"></div>
+    </div>
+    <div class="qv-progress-bar"><div class="qv-progress-fill" id="qv-progress-fill"></div></div>
+    <div class="qv-body">
+      <div class="qv-col">
+        <div class="qv-col-title green">✓ What We Know</div>
+        <div id="qv-know"></div>
+      </div>
+      <div class="qv-col">
+        <div class="qv-col-title amber">⚠ Still Need to ID</div>
+        <div id="qv-need"></div>
+      </div>
+    </div>
+    <div class="qv-section" id="qv-rf-section" style="display:none;">
+      <div class="qv-section-title">🚩 Open Red Flags</div>
+      <div id="qv-redflags"></div>
+    </div>
+    <div class="qv-section" id="qv-actions-section" style="display:none;">
+      <div class="qv-section-title">📋 Active Actions</div>
+      <div class="qv-actions-grid" id="qv-actions"></div>
+    </div>
+    <div class="qv-section" id="qv-notes-section" style="display:none;">
+      <div class="qv-section-title">📝 Seller Notes</div>
+      <div class="qv-notes-box" id="qv-notes"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.12.3/mammoth.browser.min.js"></script>
+<script>
+// ── Criterion registry ────────────────────────────────────────────────────────
+const CRITS = [
+  // Stage 1
+  {id:'s1_r1',stage:'s1',rf:false},{id:'s1_r2',stage:'s1',rf:false},
+  {id:'s1_t1',stage:'s1',rf:false},{id:'s1_t2',stage:'s1',rf:false},{id:'s1_t3',stage:'s1',rf:false},
+  {id:'s1_t4',stage:'s1',rf:false},{id:'s1_t5',stage:'s1',rf:false},{id:'s1_t6',stage:'s1',rf:false},
+  {id:'s1_e1',stage:'s1',rf:false},{id:'s1_e2',stage:'s1',rf:false},{id:'s1_e3',stage:'s1',rf:false},
+  {id:'s1_e4',stage:'s1',rf:false},{id:'s1_e5',stage:'s1',rf:false},
+  {id:'s1_f1',stage:'s1',rf:false},{id:'s1_f2',stage:'s1',rf:false},{id:'s1_f3',stage:'s1',rf:false},{id:'s1_f4',stage:'s1',rf:false},
+  {id:'s1_p1',stage:'s1',rf:false},{id:'s1_p2',stage:'s1',rf:false},{id:'s1_p3',stage:'s1',rf:false},
+  {id:'s1_p4',stage:'s1',rf:false},{id:'s1_p5',stage:'s1',rf:false},{id:'s1_p6',stage:'s1',rf:false},
+  {id:'s1_p7',stage:'s1',rf:false},{id:'s1_p8',stage:'s1',rf:false},
+  // Stage 2
+  {id:'s2_w1',stage:'s2',rf:false},{id:'s2_w2',stage:'s2',rf:false},{id:'s2_w3',stage:'s2',rf:false},
+  {id:'s2_w4',stage:'s2',rf:false},{id:'s2_w5',stage:'s2',rf:false},{id:'s2_w6',stage:'s2',rf:false},
+  {id:'s2_w7',stage:'s2',rf:false},{id:'s2_w8',stage:'s2',rf:false},
+  {id:'s2_v1',stage:'s2',rf:false},{id:'s2_v2',stage:'s2',rf:false},{id:'s2_v3',stage:'s2',rf:false},
+  {id:'s2_v4',stage:'s2',rf:false},{id:'s2_v5',stage:'s2',rf:false},
+  {id:'s2_v6',stage:'s2',rf:false,dsc:true},{id:'s2_v7',stage:'s2',rf:false,dsc:true},
+  {id:'s2_s1',stage:'s2',rf:false,dsc:true},{id:'s2_s2',stage:'s2',rf:false,dsc:true},
+  {id:'s2_s3',stage:'s2',rf:false,dsc:true},{id:'s2_s4',stage:'s2',rf:false,dsc:true},{id:'s2_s5',stage:'s2',rf:false,dsc:true},
+  {id:'s2_rf1',stage:'s2',rf:true,dsc:true},{id:'s2_rf2',stage:'s2',rf:true,dsc:true},
+  {id:'s2_rf3',stage:'s2',rf:true,dsc:true},{id:'s2_rf4',stage:'s2',rf:true,dsc:true},{id:'s2_rf5',stage:'s2',rf:true,dsc:true},
+  // Stage 3
+  {id:'s3_d1',stage:'s3',rf:false},{id:'s3_d2',stage:'s3',rf:false},{id:'s3_d3',stage:'s3',rf:false},
+  {id:'s3_d4',stage:'s3',rf:false},{id:'s3_d5',stage:'s3',rf:false},{id:'s3_d6',stage:'s3',rf:false},
+  {id:'s3_d7',stage:'s3',rf:false},{id:'s3_d8',stage:'s3',rf:false},
+  // Stage 4
+  {id:'s4_c1',stage:'s4',rf:false},{id:'s4_c2',stage:'s4',rf:false},{id:'s4_c3',stage:'s4',rf:false},
+  {id:'s4_c4',stage:'s4',rf:false},{id:'s4_c5',stage:'s4',rf:false},{id:'s4_c6',stage:'s4',rf:false},
+];
+
+const chk = id => { const el = document.getElementById('chk-'+id); return el ? el.checked : false; };
+
+function calcStage() {
+  if (chk('s4_c4') && chk('s4_c5')) return 4;
+  if (chk('s3_d3') && chk('s3_d7')) return 3;
+  if (chk('s1_e3') && chk('s1_e5') && chk('s1_f4')) return 2;
+  if (chk('s1_r1') && chk('s1_e3')) return 1;
+  return 0;
+}
+
+function updateAll() {
+  CRITS.forEach(c => {
+    const isChk = chk(c.id);
+    const bdg = document.getElementById('bdg-'+c.id);
+    const txt = document.getElementById('txt-'+c.id);
+    const row = document.getElementById('row-'+c.id);
+    if (bdg) {
+      if (c.rf) { bdg.textContent = isChk ? '✓ Mitigated' : '⚠ Open'; bdg.className = 'status-badge ' + (isChk ? 'badge-done' : 'badge-risk'); }
+      else       { bdg.textContent = isChk ? '✓ Done'      : 'Pending'; bdg.className = 'status-badge ' + (isChk ? 'badge-done' : 'badge-pending'); }
+    }
+    if (txt) txt.className = 'crit-text' + (isChk ? ' done' : '');
+    if (row) row.className = 'crit-row' + (isChk ? ' checked' : '');
+  });
+
+  ['s1','s2','s3','s4'].forEach(s => {
+    const sc = CRITS.filter(c => c.stage === s);
+    const done = sc.filter(c => chk(c.id)).length;
+    const el = document.getElementById('stat-'+s); if (el) el.textContent = done+' / '+sc.length+' done';
+  });
+  const allDone = CRITS.filter(c => chk(c.id)).length;
+  const allEl = document.getElementById('stat-all'); if (allEl) allEl.textContent = allDone+' / '+CRITS.length+' done';
+
+  const total = CRITS.length;
+  const done  = CRITS.filter(c => chk(c.id)).length;
+
+  syncChecklistToDealInfo();
+  renderOpenItems();
+}
+
+function toggleStage(id) {
+  const body = document.getElementById('body-'+id);
+  const tgl  = document.getElementById('tgl-'+id);
+  const open = body.classList.toggle('open');
+  tgl.classList.toggle('open', open);
+}
+
+// ── Inline Open Items renderer ────────────────────────────────────────────────
+const stageLabels = {s1:'Stage 1 · Qualify', s2:'Stage 2 · Develop', s3:'Stage 3 · Prove', s4:'Stage 4 · Negotiate'};
+
+function renderOpenItems() {
+  const knowEl = document.getElementById('oi-know');
+  const needEl = document.getElementById('oi-need');
+  const rfEl   = document.getElementById('oi-redflags');
+  const rfSec  = document.getElementById('oi-rf-section');
+  if (!knowEl) return;
+
+  // ── What We Know (all checked, non-rf criteria) ──
+  knowEl.innerHTML = '';
+  let knowCount = 0;
+  ['s1','s2','s3','s4'].forEach(s => {
+    const stageCrits = CRITS.filter(c => c.stage === s && !c.rf && chk(c.id));
+    if (!stageCrits.length) return;
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:0.63rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin:' + (knowCount > 0 ? '10px' : '0') + ' 0 4px;' + (knowCount > 0 ? 'padding-top:8px;border-top:1px solid #f0f0f0;' : '');
+    hdr.textContent = stageLabels[s];
+    knowEl.appendChild(hdr);
+    stageCrits.forEach(c => {
+      const txtEl = document.getElementById('txt-'+c.id);
+      const dscEl = document.getElementById('dsc-'+c.id);
+      const ntsEl = document.getElementById('nts-'+c.id);
+      const q = txtEl ? txtEl.textContent.trim() : (dscEl && dscEl.value ? dscEl.value.trim() : c.id);
+      const note = ntsEl ? ntsEl.value.trim() : '';
+      const div = document.createElement('div');
+      div.style.cssText = 'font-size:0.78rem;padding:3px 0;display:flex;flex-direction:column;gap:2px;';
+      div.innerHTML = `<span style="color:#15803d;font-weight:600;">● ${q}</span>` + (note ? `<span style="font-size:0.72rem;color:#4b5563;font-style:italic;padding-left:14px;">${note}</span>` : '');
+      knowEl.appendChild(div);
+      knowCount++;
+    });
+  });
+  if (knowCount === 0) knowEl.innerHTML = '<div style="font-size:0.78rem;color:#bbb;font-style:italic;">Nothing confirmed yet</div>';
+
+  // ── Still Need to ID (unchecked QV highlights) ──
+  needEl.innerHTML = '';
+  let needCount = 0;
+  QV_HIGHLIGHTS.forEach(h => {
+    if (chk(h.id)) return;
+    const txtEl = document.getElementById('txt-'+h.id);
+    const dscEl = document.getElementById('dsc-'+h.id);
+    const q = txtEl ? txtEl.textContent.trim() : (dscEl && dscEl.value ? dscEl.value.trim() : h.label);
+    const div = document.createElement('div');
+    div.style.cssText = 'font-size:0.78rem;padding:3px 0;color:#92400e;font-weight:500;';
+    div.innerHTML = `○ ${q}`;
+    needEl.appendChild(div);
+    needCount++;
+  });
+  if (needCount === 0) needEl.innerHTML = '<div style="font-size:0.78rem;color:#bbb;font-style:italic;">All highlights confirmed ✓</div>';
+
+  // ── Open Red Flags ──
+  rfEl.innerHTML = '';
+  let rfCount = 0;
+  QV_REDFLAGS.forEach(id => {
+    if (chk(id)) return; // mitigated
+    const dscEl = document.getElementById('dsc-'+id);
+    const ntsEl = document.getElementById('nts-'+id);
+    const desc = dscEl ? dscEl.value.trim() : '';
+    if (!desc) return;
+    const badge = document.createElement('div');
+    badge.style.cssText = 'font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:6px;background:#fee2e2;color:#991b1b;';
+    badge.textContent = '⚠ ' + desc;
+    rfEl.appendChild(badge);
+    rfCount++;
+  });
+  rfSec.style.display = rfCount > 0 ? '' : 'none';
+}
+
+// ── Action Planner ────────────────────────────────────────────────────────────
+let actions = [];
+
+function addAction(data) {
+  const id = Date.now() + Math.random();
+  actions.push(Object.assign({id, status:'Open', type:'', desc:'', owner:'', due:''}, data || {}));
+  renderActions();
+}
+
+function removeAction(id) {
+  actions = actions.filter(a => a.id !== id);
+  renderActions();
+}
+
+function setAction(id, field, val) {
+  const a = actions.find(a => a.id === id);
+  if (a) a[field] = val;
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderActions() {
+  const container = document.getElementById('action-rows');
+  if (actions.length === 0) {
+    container.innerHTML = '<div class="no-actions">No actions yet — click + Add Action to get started.</div>';
+    return;
+  }
+  container.innerHTML = '';
+  const TYPES = ['','Stakeholder Outreach','Red Flag Mitigation','Champion Development','Strength Validation','Technical Validation','Reference Management','Commercial / Legal','Other'];
+  actions.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'action-row';
+    div.innerHTML = `
+      <select onchange="setAction(${a.id},'status',this.value)">
+        ${['Open','In Progress','On Hold','Closed'].map(s=>`<option${a.status===s?' selected':''}>${s}</option>`).join('')}
+      </select>
+      <select onchange="setAction(${a.id},'type',this.value)">
+        ${TYPES.map(t=>`<option value="${esc(t)}"${a.type===t?' selected':''}>${t||'— Type —'}</option>`).join('')}
+      </select>
+      <input type="text" value="${esc(a.desc)}" placeholder="Action description →" oninput="setAction(${a.id},'desc',this.value)">
+      <input type="text" value="${esc(a.owner)}" placeholder="Owner" oninput="setAction(${a.id},'owner',this.value)">
+      <input type="date" value="${esc(a.due)}" onchange="setAction(${a.id},'due',this.value)">
+      <button class="remove-btn" onclick="removeAction(${a.id})" title="Remove">✕</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ── Deal Info ↔ Checklist sync ────────────────────────────────────────────────
+
+// The 14 mirrored field pairs: [checklist-note-id, deal-info-id]
+const DI_SYNC_PAIRS = [
+  ['nts-s1_t1','nts-s1_t1-di'],['nts-s1_t2','nts-s1_t2-di'],
+  ['nts-s1_t3','nts-s1_t3-di'],['nts-s1_t4','nts-s1_t4-di'],
+  ['nts-s1_t5','nts-s1_t5-di'],['nts-s1_t6','nts-s1_t6-di'],
+  ['nts-s1_p1','nts-s1_p1-di'],['nts-s1_p2','nts-s1_p2-di'],
+  ['nts-s1_p3','nts-s1_p3-di'],['nts-s1_p4','nts-s1_p4-di'],
+  ['nts-s1_p5','nts-s1_p5-di'],['nts-s1_p6','nts-s1_p6-di'],
+  ['nts-s1_p7','nts-s1_p7-di'],['nts-s1_p8','nts-s1_p8-di'],
+];
+
+// Called when user edits a Deal Info field — pushes to checklist
+function syncDealInfo(checklistId, dealInfoId) {
+  const diEl  = document.getElementById(dealInfoId);
+  const clEl  = document.getElementById(checklistId);
+  if (diEl && clEl) clEl.value = diEl.value;
+  updateAll();
+}
+
+// Called by updateAll — pulls checklist values into Deal Info if Deal Info is empty
+// (so AI/transcript updates to checklist also appear in Deal Info)
+function syncChecklistToDealInfo() {
+  DI_SYNC_PAIRS.forEach(([clId, diId]) => {
+    const clEl = document.getElementById(clId);
+    const diEl = document.getElementById(diId);
+    if (!clEl || !diEl) return;
+    // Checklist → Deal Info: always follow the checklist value
+    if (clEl.value) {
+      diEl.value = clEl.value;
+    } else if (diEl.value) {
+      // Deal Info → Checklist: only on initial load when checklist is blank
+      clEl.value = diEl.value;
+    }
+  });
+}
+
+// ── State encode / decode ─────────────────────────────────────────────────────
+function getState() {
+  const s = {};
+  ['prospect','website','bc','sdr','ees','arr','close','sc','bant-budget','bant-authority','bant-need','bant-timing'].forEach(f => {
+    const v = document.getElementById('dh-'+f); if (v && v.value) s['h_'+f] = v.value;
+  });
+  CRITS.forEach(c => {
+    if (chk(c.id)) s['c_'+c.id] = 1;
+    const n = document.getElementById('nts-'+c.id); if (n && n.value) s['n_'+c.id] = n.value;
+    if (c.dsc) { const d = document.getElementById('dsc-'+c.id); if (d && d.value) s['d_'+c.id] = d.value; }
+  });
+  const sn = document.getElementById('seller-notes'); if (sn && sn.value) s['sn'] = sn.value;
+  if (actions.length) s['ar'] = actions.map(a => ({s:a.status,t:a.type,d:a.desc,o:a.owner,du:a.due}));
+  return s;
+}
+
+function restoreState(s) {
+  ['prospect','website','bc','sdr','ees','arr','close','sc','bant-budget','bant-authority','bant-need','bant-timing'].forEach(f => {
+    const el = document.getElementById('dh-'+f); if (el && s['h_'+f]) el.value = s['h_'+f];
+  });
+  CRITS.forEach(c => {
+    const chkEl = document.getElementById('chk-'+c.id); if (chkEl) chkEl.checked = !!s['c_'+c.id];
+    const n = document.getElementById('nts-'+c.id); if (n && s['n_'+c.id]) n.value = s['n_'+c.id];
+    if (c.dsc) { const d = document.getElementById('dsc-'+c.id); if (d && s['d_'+c.id]) d.value = s['d_'+c.id]; }
+  });
+  const sn = document.getElementById('seller-notes'); if (sn && s['sn']) sn.value = s['sn'];
+  if (s['ar'] && Array.isArray(s['ar'])) {
+    actions = s['ar'].map(a => ({id:Date.now()+Math.random(), status:a.s||'Open', type:a.t||'', desc:a.d||'', owner:a.o||'', due:a.du||''}));
+    renderActions();
+  }
+  updateAll();
+}
+
+function restoreFromURL() {
+  const params = new URLSearchParams(location.search);
+  const co = params.get('co');
+  if (co) { const el = document.getElementById('dh-prospect'); if (el) el.value = co; }
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  try { restoreState(JSON.parse(decodeURIComponent(hash))); } catch(e) {}
+}
+
+// ── Save functions ────────────────────────────────────────────────────────────
+function showConfirm(msg) {
+  const el = document.getElementById('copy-confirm');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function copyLink() {
+  const state = getState();
+  const prospect = (state['h_prospect'] || '').trim();
+  delete state['h_prospect'];
+  const base    = location.href.split('?')[0].split('#')[0];
+  const coParam = prospect ? '?co=' + encodeURIComponent(prospect) : '';
+  const hash    = '#' + encodeURIComponent(JSON.stringify(state));
+  const url     = base + coParam + hash;
+  navigator.clipboard.writeText(url).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }).finally(() => showConfirm('🔗 Link copied!'));
+}
+
+function copySummary() {
+  const state  = getState();
+  const stage  = calcStage();
+  const stageNames = ['Pre-Qualify','Stage 1 — Qualify','Stage 2 — Develop','Stage 3 — Prove','Stage 4 — Negotiate'];
+  const L = [];
+  L.push('QUICK ASSESS — Enterprise HCM Opportunity Assessment');
+  L.push('VensureHR · UKG Ready');
+  L.push('');
+  L.push('Prospect: '      + (state['h_prospect'] || '(not entered)'));
+  if (state['h_bc'])    L.push('BC: '             + state['h_bc']);
+  if (state['h_sdr'])   L.push('SDR: '            + state['h_sdr']);
+  if (state['h_ees'])   L.push('# EEs: '          + state['h_ees']);
+  if (state['h_arr'])   L.push('Est. ARR: '       + state['h_arr']);
+  if (state['h_close']) L.push('Target Close: '   + state['h_close']);
+  L.push('');
+  L.push('STAGE: ' + stageNames[stage]);
+  const total = CRITS.length;
+  const done  = CRITS.filter(c => chk(c.id)).length;
+  L.push('Progress: ' + done + ' / ' + total + ' complete (' + Math.round(done/total*100) + '%)');
+  L.push('');
+  const open = CRITS.filter(c => !chk(c.id));
+  if (open.length) {
+    L.push('OPEN ITEMS (' + open.length + ')');
+    open.forEach(c => {
+      const t = document.getElementById('txt-'+c.id);
+      const d = document.getElementById('dsc-'+c.id);
+      L.push('  [ ] ' + (t ? t.textContent : (d && d.value ? d.value : c.id)));
+    });
+    L.push('');
+  }
+  if (actions.length) {
+    L.push('ACTION PLANNER');
+    actions.forEach(a => L.push('  [' + a.status + '] ' + (a.desc || '—') + (a.owner ? ' · ' + a.owner : '') + (a.due ? ' · ' + a.due : '')));
+    L.push('');
+  }
+  if (state['sn']) { L.push('SELLER NOTES'); L.push(state['sn']); L.push(''); }
+  L.push('Generated: ' + new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}));
+
+  const text = L.join('\n');
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }).finally(() => showConfirm('📋 Copied!'));
+}
+
+// ── Sheet View ────────────────────────────────────────────────────────────────
+
+const SV_STAGES = [
+  { id:'s1', cls:'s1', label:'Stage 1  ·  Qualify', sub:'Initial Appointment (IA)',
+    subsections: [
+      { label:'Prospect Research & Setup', ids:['s1_r1','s1_r2'] },
+      { label:'Current Tech Stack', ids:['s1_t1','s1_t2','s1_t3','s1_t4','s1_t5','s1_t6'] },
+      { label:'Essentials Qualification', ids:['s1_e1','s1_e2','s1_e3','s1_e4','s1_e5'] },
+      { label:'Initial Fit Assessment', ids:['s1_f1','s1_f2','s1_f3','s1_f4'] },
+      { label:'Buyer Personas Identified', ids:['s1_p1','s1_p2','s1_p3','s1_p4','s1_p5','s1_p6','s1_p7','s1_p8'] },
+    ]
+  },
+  { id:'s2', cls:'s2', label:'Stage 2  ·  Develop', sub:'Diagnostic (Discovery)',
+    subsections: [
+      { label:"Buyer Influencer Wins — their words", ids:['s2_w1','s2_w2','s2_w3','s2_w4','s2_w5','s2_w6','s2_w7','s2_w8'] },
+      { label:'Enterprise Value Proposition Validation', ids:['s2_v1','s2_v2','s2_v3','s2_v4','s2_v5','s2_v6','s2_v7'] },
+      { label:'Key Strengths', ids:['s2_s1','s2_s2','s2_s3','s2_s4','s2_s5'] },
+      { label:'Key Red Flags', ids:['s2_rf1','s2_rf2','s2_rf3','s2_rf4','s2_rf5'] },
+    ]
+  },
+  { id:'s3', cls:'s3', label:'Stage 3  ·  Prove', sub:'Demonstration(s) — 70% win rate',
+    subsections: [
+      { label:'Demonstration Validation Checklist', ids:['s3_d1','s3_d2','s3_d3','s3_d4','s3_d5','s3_d6','s3_d7','s3_d8'] },
+    ]
+  },
+  { id:'s4', cls:'s4', label:'Stage 4  ·  Negotiate', sub:'Finalist / Close / Contracting',
+    subsections: [
+      { label:'Verbal Stage — Commercial & Legal', ids:['s4_c1','s4_c2','s4_c3','s4_c4','s4_c5','s4_c6'] },
+    ]
+  },
+];
+
+function svEl(tag, cls, text) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  if (text != null) el.textContent = text;
+  return el;
+}
+
+function openSheetView() {
+  const stageNames = ['Pre-Qualify','Stage 1 — Qualify','Stage 2 — Develop','Stage 3 — Prove','Stage 4 — Negotiate'];
+  const stage = calcStage();
+  const total = CRITS.length;
+  const done  = CRITS.filter(c => chk(c.id)).length;
+
+  // Header
+  const prospect = (document.getElementById('dh-prospect').value || 'Unnamed Deal').trim();
+  const bc    = document.getElementById('dh-bc').value;
+  const sdr   = document.getElementById('dh-sdr').value;
+  const ees   = document.getElementById('dh-ees').value;
+  const arr   = document.getElementById('dh-arr').value;
+  const close = document.getElementById('dh-close').value;
+  const sc    = document.getElementById('dh-sc').value;
+
+  const bant_budget    = document.getElementById('dh-bant-budget').value;
+  const bant_authority = document.getElementById('dh-bant-authority').value;
+  const bant_need      = document.getElementById('dh-bant-need').value;
+  const bant_timing    = document.getElementById('dh-bant-timing').value;
+
+  const subParts = [];
+  if (prospect) subParts.push('Prospect: ' + prospect);
+  if (bc)    subParts.push('BC: ' + bc);
+  if (sdr)   subParts.push('SDR: ' + sdr);
+  if (sc)    subParts.push('SC: ' + sc);
+  document.getElementById('sv-subtitle').textContent = subParts.join('  ·  ');
+  document.getElementById('sv-stage-chip').textContent = stageNames[stage] + '  (' + done + '/' + total + ')';
+
+  // Deal info grid
+  const body = document.getElementById('sv-body');
+  body.innerHTML = '';
+
+  const infoGrid = svEl('div', 'sv-info-grid');
+  const infoFields = [
+    ['Prospect / Company', prospect],
+    ['# of Employees', ees],
+    ['Estimated ARR', arr],
+    ['Target Close Date', close],
+    ['BC', bc], ['SDR', sdr], ['SC', sc],
+    ['BANT — Budget', bant_budget],
+    ['BANT — Authority', bant_authority],
+    ['BANT — Need', bant_need],
+    ['BANT — Timing', bant_timing],
+    ['Current Stage', stageNames[stage]],
+  ];
+  infoFields.forEach(([label, val]) => {
+    const cell = svEl('div', 'sv-info-cell');
+    cell.appendChild(svEl('div', 'sv-info-label', label));
+    const v = svEl('div', val ? 'sv-info-val' : 'sv-info-val empty', val || '—');
+    cell.appendChild(v);
+    infoGrid.appendChild(cell);
+  });
+  body.appendChild(infoGrid);
+
+  // Stage blocks
+  SV_STAGES.forEach(stage => {
+    const block = svEl('div', 'sv-stage-block');
+
+    // Stage header row
+    const hdr = svEl('div', 'sv-stage-hdr ' + stage.cls);
+    hdr.innerHTML = `<div></div><div>${stage.label}</div><div style="text-align:center">Y / N</div><div>Notes / Their Words</div>`;
+    block.appendChild(hdr);
+
+    // Column heads
+    const colHeads = svEl('div', 'sv-col-heads');
+    colHeads.innerHTML = `<div>Status</div><div>${stage.sub}</div><div style="text-align:center">Done?</div><div>Notes</div>`;
+    block.appendChild(colHeads);
+
+    stage.subsections.forEach(sub => {
+      // Subsection header
+      const subHdr = svEl('div', 'sv-subsection-hdr', sub.label);
+      block.appendChild(subHdr);
+
+      sub.ids.forEach(cid => {
+        const crit = CRITS.find(c => c.id === cid);
+        if (!crit) return;
+        const isChk  = chk(cid);
+        const isRF   = crit.rf;
+        const txtEl  = document.getElementById('txt-' + cid);
+        const dscEl  = document.getElementById('dsc-' + cid);
+        const ntsEl  = document.getElementById('nts-' + cid);
+        const criterionText = txtEl ? txtEl.textContent.trim()
+                            : (dscEl && dscEl.value.trim() ? dscEl.value.trim() : '—');
+        const noteText = ntsEl ? (ntsEl.value.trim() || '') : '';
+
+        // Skip blank user-filled rows (strengths/red flags with no description)
+        if (crit.dsc && !criterionText && criterionText !== '—') return;
+        if (crit.dsc && criterionText === '—' && !noteText) return;
+
+        const rowCls = 'sv-row' + (isChk ? ' sv-checked' : '') + (isRF && !isChk ? ' sv-rf-open' : '');
+        const row = svEl('div', rowCls);
+
+        // Status cell
+        let statusText, statusCls;
+        if (isRF)  { statusText = isChk ? '✓ Mitigated' : '⚠ Open Risk'; statusCls = isChk ? 'done' : 'risk'; }
+        else       { statusText = isChk ? '✓ Done'      : 'Pending';      statusCls = isChk ? 'done' : 'pending'; }
+        row.appendChild(svEl('div', 'sv-status ' + statusCls, statusText));
+
+        // Criterion text
+        row.appendChild(svEl('div', 'sv-criterion' + (isChk && !isRF ? ' crossed' : ''), criterionText));
+
+        // Y/N cell
+        const yn = svEl('div', 'sv-yn ' + (isChk ? 'yes' : 'no'), isChk ? 'Yes' : 'No');
+        row.appendChild(yn);
+
+        // Notes
+        row.appendChild(svEl('div', 'sv-note' + (noteText ? '' : ' empty'), noteText || '—'));
+
+        block.appendChild(row);
+      });
+    });
+
+    body.appendChild(block);
+  });
+
+  // Action Planner
+  const activeActions = actions.filter(a => a.status !== 'Closed' && a.desc);
+  if (activeActions.length) {
+    const actBlock = svEl('div', 'sv-stage-block');
+    const actHdr = svEl('div', 'sv-stage-hdr', '');
+    actHdr.style.background = '#374151';
+    actHdr.innerHTML = `<div></div><div>Action Planner — Active Items</div><div style="text-align:center">Owner</div><div>Due Date</div>`;
+    actBlock.appendChild(actHdr);
+    activeActions.forEach(a => {
+      const row = svEl('div', 'sv-row');
+      const sCls = {Open:'pending','In Progress':'done','On Hold':'pending'}[a.status] || 'pending';
+      row.appendChild(svEl('div', 'sv-status ' + sCls, a.status));
+      row.appendChild(svEl('div', 'sv-criterion', (a.type ? '[' + a.type + '] ' : '') + a.desc));
+      row.appendChild(svEl('div', 'sv-yn', a.owner || '—'));
+      row.appendChild(svEl('div', 'sv-note' + (a.due ? '' : ' empty'), a.due || '—'));
+      actBlock.appendChild(row);
+    });
+    body.appendChild(actBlock);
+  }
+
+  // Seller Notes
+  const notes = document.getElementById('seller-notes').value.trim();
+  if (notes) {
+    const notesBlock = svEl('div', 'sv-stage-block');
+    notesBlock.style.background = '#fff';
+    notesBlock.innerHTML = `<div class="sv-subsection-hdr" style="padding-left:10px;border-top:none;">Seller Notes</div>`;
+    const nd = svEl('div', '');
+    nd.style.cssText = 'padding:10px 12px;font-size:0.82rem;color:#374151;white-space:pre-wrap;line-height:1.55;background:#fff;';
+    nd.textContent = notes;
+    notesBlock.appendChild(nd);
+    body.appendChild(notesBlock);
+  }
+
+  document.getElementById('sv-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSheetView() {
+  document.getElementById('sv-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleSVOverlayClick(e) {
+  if (e.target === document.getElementById('sv-overlay')) closeSheetView();
+}
+
+function svCopySummary() {
+  const stageNames = ['Pre-Qualify','Stage 1 — Qualify','Stage 2 — Develop','Stage 3 — Prove','Stage 4 — Negotiate'];
+  const stage = calcStage();
+  const total = CRITS.length;
+  const done  = CRITS.filter(c => chk(c.id)).length;
+  const prospect = (document.getElementById('dh-prospect').value || 'Unnamed Deal').trim();
+  const bc    = document.getElementById('dh-bc').value;
+  const sdr   = document.getElementById('dh-sdr').value;
+  const ees   = document.getElementById('dh-ees').value;
+  const arr   = document.getElementById('dh-arr').value;
+  const close = document.getElementById('dh-close').value;
+  const sc    = document.getElementById('dh-sc').value;
+  const bant_budget    = document.getElementById('dh-bant-budget').value;
+  const bant_authority = document.getElementById('dh-bant-authority').value;
+  const bant_need      = document.getElementById('dh-bant-need').value;
+  const bant_timing    = document.getElementById('dh-bant-timing').value;
+
+  const L = [];
+  L.push('QUICK ASSESS  |  Enterprise HCM  |  Opportunity Assessment');
+  L.push('VensureHR · UKG Ready');
+  L.push('');
+  if (prospect) L.push('Prospect:      ' + prospect);
+  if (ees)      L.push('# of EEs:      ' + ees);
+  if (arr)      L.push('Est. ARR:      ' + arr);
+  if (close)    L.push('Target Close:  ' + close);
+  if (bc)       L.push('BC:            ' + bc);
+  if (sdr)      L.push('SDR:           ' + sdr);
+  if (sc)       L.push('SC:            ' + sc);
+  if (bant_budget || bant_authority || bant_need || bant_timing) {
+    L.push('');
+    L.push('BANT:');
+    if (bant_budget)    L.push('  Budget:    ' + bant_budget);
+    if (bant_authority) L.push('  Authority: ' + bant_authority);
+    if (bant_need)      L.push('  Need:      ' + bant_need);
+    if (bant_timing)    L.push('  Timing:    ' + bant_timing);
+  }
+  L.push('Current Stage: ' + stageNames[stage] + '  (' + done + '/' + total + ' complete)');
+  L.push('');
+
+  SV_STAGES.forEach(sv => {
+    L.push('─'.repeat(60));
+    L.push(sv.label.toUpperCase());
+    sv.subsections.forEach(sub => {
+      L.push('  ' + sub.label);
+      sub.ids.forEach(cid => {
+        const crit = CRITS.find(c => c.id === cid);
+        if (!crit) return;
+        const isChk = chk(cid);
+        const txtEl = document.getElementById('txt-' + cid);
+        const dscEl = document.getElementById('dsc-' + cid);
+        const ntsEl = document.getElementById('nts-' + cid);
+        const criterionText = txtEl ? txtEl.textContent.trim()
+                            : (dscEl && dscEl.value.trim() ? dscEl.value.trim() : null);
+        const noteText = ntsEl ? ntsEl.value.trim() : '';
+        if (crit.dsc && !criterionText && !noteText) return; // skip blank rows
+        const status = crit.rf ? (isChk ? '✓ Mitigated' : '⚠ Open Risk')
+                               : (isChk ? '✓ Done      ' : 'Pending     ');
+        L.push('    [' + status + ']  ' + (criterionText || '—'));
+        if (noteText) L.push('               → ' + noteText);
+      });
+    });
+    L.push('');
+  });
+
+  const activeActions = actions.filter(a => a.status !== 'Closed' && a.desc);
+  if (activeActions.length) {
+    L.push('─'.repeat(60));
+    L.push('ACTION PLANNER — ACTIVE ITEMS');
+    activeActions.forEach(a => {
+      L.push('  [' + a.status + ']  ' + (a.type ? '[' + a.type + '] ' : '') + a.desc +
+             (a.owner ? '  ·  ' + a.owner : '') + (a.due ? '  ·  ' + a.due : ''));
+    });
+    L.push('');
+  }
+
+  const notes = document.getElementById('seller-notes').value.trim();
+  if (notes) {
+    L.push('─'.repeat(60));
+    L.push('SELLER NOTES');
+    L.push(notes);
+    L.push('');
+  }
+
+  L.push('Generated: ' + new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}));
+
+  const text = L.join('\n');
+  navigator.clipboard.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+  }).finally(() => showConfirm('📋 Copied!'));
+}
+
+function svPrint() {
+  // Make sure sheet view is open and rendered
+  if (!document.getElementById('sv-overlay').classList.contains('open')) {
+    openSheetView();
+    setTimeout(() => { document.body.classList.add('sv-printing'); window.print(); document.body.classList.remove('sv-printing'); }, 300);
+  } else {
+    document.body.classList.add('sv-printing');
+    window.print();
+    document.body.classList.remove('sv-printing');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSheetView(); closeQuickView(); }
+});
+
+// ── Quick View ────────────────────────────────────────────────────────────────
+
+// Criteria that are "key" highlights for the Quick View (checked = what we know, unchecked = need to ID)
+// We pick the most meaningful ones across all stages — not every row.
+const QV_HIGHLIGHTS = [
+  // Qualify
+  {id:'s1_r1', label:'Deal in SFDC'},
+  {id:'s1_e3', label:'Initial pain surfaced'},
+  {id:'s1_e5', label:'Decision maker identified', noteField:'nts-s1_e5'},
+  {id:'s1_f4', label:'Segment identified', noteField:'nts-s1_f4'},
+  {id:'s1_e1', label:'Budget discussed'},
+  {id:'s1_e2', label:'Pending event identified', noteField:'nts-s1_e2'},
+  {id:'s1_f3', label:'HR-driven decision confirmed'},
+  {id:'s1_f1', label:'Functional requirements can be met'},
+  // Tech stack
+  {id:'s1_t1', label:'Payroll provider ID\'d', noteField:'nts-s1_t1'},
+  {id:'s1_t2', label:'T&A provider ID\'d', noteField:'nts-s1_t2'},
+  {id:'s1_t3', label:'HRIS ID\'d', noteField:'nts-s1_t3'},
+  // Personas
+  {id:'s1_p1', label:'HR Director / CHRO', noteField:'nts-s1_p1'},
+  {id:'s1_p2', label:'Payroll Manager', noteField:'nts-s1_p2'},
+  {id:'s1_p8', label:'CFO / Finance lead', noteField:'nts-s1_p8'},
+  // Develop
+  {id:'s2_w1', label:'HR win articulated', noteField:'nts-s2_w1'},
+  {id:'s2_v4', label:'Single-platform value validated'},
+  {id:'s2_v5', label:'Service model validated'},
+  // Prove
+  {id:'s3_d3', label:'Payroll / Time gaps resolved', noteField:'nts-s3_d3'},
+  {id:'s3_d5', label:'Price aligned to budget', noteField:'nts-s3_d5'},
+  {id:'s3_d7', label:'Champion tested', noteField:'nts-s3_d7'},
+  {id:'s3_d8', label:'Incumbent notice period known', noteField:'nts-s3_d8'},
+  // Negotiate
+  {id:'s4_c1', label:'Final decision process confirmed', noteField:'nts-s4_c1'},
+  {id:'s4_c2', label:'Proposal to economic buyer'},
+];
+
+const QV_REDFLAGS = ['s2_rf1','s2_rf2','s2_rf3','s2_rf4','s2_rf5'];
+
+function openQuickView() {
+  const stageNames = ['Pre-Qualify','Stage 1 — Qualify','Stage 2 — Develop','Stage 3 — Prove','Stage 4 — Negotiate'];
+  const stageCls   = ['banner-prequal','banner-s1','banner-s2','banner-s3','banner-s4'];
+  const stage      = calcStage();
+  const total      = CRITS.length;
+  const done       = CRITS.filter(c => chk(c.id)).length;
+  const pct        = Math.round(done / total * 100);
+
+  // Header
+  const prospect = (document.getElementById('dh-prospect').value || 'Unnamed Deal').trim();
+  const bc    = document.getElementById('dh-bc').value;
+  const ees   = document.getElementById('dh-ees').value;
+  const arr   = document.getElementById('dh-arr').value;
+  const close = document.getElementById('dh-close').value;
+  const metaParts = [];
+  if (bc)    metaParts.push('BC: ' + bc);
+  if (ees)   metaParts.push(ees + ' EEs');
+  if (arr)   metaParts.push('Est. ARR: ' + arr);
+  if (close) metaParts.push('Target Close: ' + close);
+
+  document.getElementById('qv-name').textContent       = prospect;
+  document.getElementById('qv-meta').textContent       = metaParts.join('  ·  ');
+  document.getElementById('qv-stage-name').textContent = stageNames[stage];
+  document.getElementById('qv-stage-pct').textContent  = done + ' / ' + total + ' complete (' + pct + '%)';
+  document.getElementById('qv-progress-fill').style.width = pct + '%';
+
+  // Know column — ALL checked criteria, grouped by stage
+  const knowEl = document.getElementById('qv-know');
+  knowEl.innerHTML = '';
+  let knowCount = 0;
+
+  const stageLabels = {s1:'Stage 1 · Qualify', s2:'Stage 2 · Develop', s3:'Stage 3 · Prove', s4:'Stage 4 · Negotiate'};
+
+  ['s1','s2','s3','s4'].forEach(stage => {
+    const stageCrits = CRITS.filter(c => c.stage === stage && chk(c.id));
+    if (stageCrits.length === 0) return;
+
+    const groupHdr = document.createElement('div');
+    groupHdr.style.cssText = 'font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);margin:10px 0 4px;padding-top:8px;border-top:1px solid #f0f0f0;';
+    if (knowCount === 0) groupHdr.style.borderTop = 'none';
+    groupHdr.textContent = stageLabels[stage];
+    knowEl.appendChild(groupHdr);
+
+    stageCrits.forEach(c => {
+      const txtEl = document.getElementById('txt-'+c.id);
+      const dscEl = document.getElementById('dsc-'+c.id);
+      const ntsEl = document.getElementById('nts-'+c.id);
+      const questionText = txtEl ? txtEl.textContent.trim()
+                         : (dscEl && dscEl.value ? dscEl.value.trim() : c.id);
+      const note = ntsEl ? (ntsEl.value || '').trim() : '';
+
+      const item = document.createElement('div');
+      item.className = 'qv-item done';
+      const noteHTML = note ? `<div class="qv-note">${note}</div>` : '';
+      item.innerHTML = `<span class="qv-item-dot">●</span><div><div class="qv-item-q">${questionText}</div>${noteHTML}</div>`;
+      knowEl.appendChild(item);
+      knowCount++;
+    });
+  });
+
+  if (knowCount === 0) knowEl.innerHTML = '<div class="qv-empty">Nothing confirmed yet</div>';
+
+  // Need column — curated highlights that are NOT yet checked
+  const needEl = document.getElementById('qv-need');
+  needEl.innerHTML = '';
+  let needCount = 0;
+
+  QV_HIGHLIGHTS.forEach(h => {
+    if (chk(h.id)) return; // already in "What We Know"
+    const txtEl = document.getElementById('txt-'+h.id);
+    const dscEl = document.getElementById('dsc-'+h.id);
+    const questionText = txtEl ? txtEl.textContent.trim()
+                       : (dscEl && dscEl.value ? dscEl.value.trim() : h.label);
+    const item = document.createElement('div');
+    item.className = 'qv-item open';
+    item.innerHTML = `<span class="qv-item-dot">○</span><div><div class="qv-item-q">${questionText}</div></div>`;
+    needEl.appendChild(item);
+    needCount++;
+  });
+
+  if (needCount === 0) needEl.innerHTML = '<div class="qv-empty">All key highlights confirmed ✓</div>';
+
+  // Red flags
+  const rfEl = document.getElementById('qv-redflags');
+  rfEl.innerHTML = '';
+  let openRFs = 0;
+  QV_REDFLAGS.forEach(id => {
+    const dscEl = document.getElementById('dsc-'+id);
+    const desc  = dscEl ? dscEl.value.trim() : '';
+    if (!desc) return; // skip blank rows
+    const isChk = chk(id);
+    if (!isChk) {
+      openRFs++;
+      const item = document.createElement('div');
+      item.className = 'qv-item risk';
+      item.innerHTML = `<span class="qv-item-dot">●</span><div>${desc}</div>`;
+      rfEl.appendChild(item);
+    }
+  });
+  document.getElementById('qv-rf-section').style.display = openRFs > 0 ? '' : 'none';
+
+  // Active actions
+  const actEl = document.getElementById('qv-actions');
+  actEl.innerHTML = '';
+  const activeActions = actions.filter(a => a.status !== 'Closed' && a.desc);
+  activeActions.forEach(a => {
+    const row = document.createElement('div');
+    row.className = 'qv-action-row';
+    const sCls = {Open:'open','In Progress':'progress','On Hold':'hold','Closed':'closed'}[a.status] || 'open';
+    row.innerHTML = `<span class="qv-action-status ${sCls}">${a.status}</span><span>${a.desc}${a.owner ? ' <span style="color:var(--muted);font-size:0.75rem;">· '+a.owner+'</span>' : ''}${a.due ? ' <span style="color:var(--muted);font-size:0.75rem;">· '+a.due+'</span>' : ''}</span>`;
+    actEl.appendChild(row);
+  });
+  document.getElementById('qv-actions-section').style.display = activeActions.length > 0 ? '' : 'none';
+
+  // Notes
+  const notes = document.getElementById('seller-notes').value.trim();
+  document.getElementById('qv-notes').textContent = notes;
+  document.getElementById('qv-notes-section').style.display = notes ? '' : 'none';
+
+  document.getElementById('qv-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuickView() {
+  document.getElementById('qv-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('qv-overlay')) closeQuickView();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQuickView(); });
+
+// ── AI Import ─────────────────────────────────────────────────────────────────
+
+// All criteria with their labels for the AI prompt
+const AI_CRITERIA_MAP = {
+  // Deal header fields
+  'dh-prospect': 'Prospect / Company Name',
+  'dh-website':  'Prospect website URL',
+  'dh-bc':       'BC (Business Consultant) name',
+  'dh-sdr':      'SDR name',
+  'dh-ees':      'Number of employees',
+  'dh-arr':      'Estimated ARR / annual contract value',
+  'dh-close':    'Target close date (YYYY-MM-DD format)',
+  'dh-sc':       'SC (Solutions Consultant) name',
+  'dh-bant-budget':    'BANT — Budget (budget range, confirmed/unconfirmed, amount if known)',
+  'dh-bant-authority': 'BANT — Authority (decision maker name/title)',
+  'dh-bant-need':      'BANT — Need (primary pain point or business need)',
+  'dh-bant-timing':    'BANT — Timing (timeline, urgency driver, or target go-live)',
+  // Stage 1 checkboxes + notes
+  's1_r1': 'Deal created in SFDC — note: SFDC account URL',
+  's1_r2': 'Prospect website & LinkedIn reviewed, ICP research complete — note: key ICP fit observations',
+  's1_t1': 'Current Payroll Provider identified — note: vendor name',
+  's1_t2': 'Current Time & Attendance identified — note: vendor name',
+  's1_t3': 'Current HR / HRIS identified — note: vendor name',
+  's1_t4': 'Current ATS (Applicant Tracking) identified — note: vendor name',
+  's1_t5': 'Current Talent (Perf / Comp / LMS) identified — note: vendor name',
+  's1_t6': 'Current Benefits Admin identified — note: vendor name',
+  's1_e1': 'Budget identified / discussed (BANT) — note: budget range and timing',
+  's1_e2': 'Pending event identified (renewal, compliance, PEO exit, growth spike) — note: event and date',
+  's1_e3': 'Initial discovery complete, pain surfaced and acknowledged by prospect — note: key pain in their words',
+  's1_e4': 'Mutual action plan / committed next step — note: agreed next step and date',
+  's1_e5': 'Decision maker identified — note: name and title',
+  's1_f1': 'Can we meet functional requirements — note: any known functional gaps',
+  's1_f2': 'Desired go-live date known and achievable — note: target live date',
+  's1_f3': 'Is this an HR-driven decision — note: if not, who is driving and why',
+  's1_f4': 'Segment identified (SMB / Mid-Market / Enterprise / Vertical) — note: segment and vertical',
+  's1_p1': 'HR Director / CHRO identified — note: name and title',
+  's1_p2': 'Payroll Manager identified — note: name and title',
+  's1_p3': 'Benefits Administrator identified — note: name and title',
+  's1_p4': 'Talent Acquisition / Recruiter identified — note: name and title',
+  's1_p5': 'Talent Mgmt / L&D identified — note: name and title',
+  's1_p6': 'Performance / Comp Manager identified — note: name and title',
+  's1_p7': 'IT Director identified — note: name and title',
+  's1_p8': 'CFO / Finance lead identified — note: name and title',
+  // Stage 2
+  's2_w1': 'HR win identified and articulated in prospect\'s words — note: their exact words',
+  's2_w2': 'Payroll / PR win identified and articulated — note: their exact words',
+  's2_w3': 'Benefits win identified and articulated — note: their exact words',
+  's2_w4': 'Recruitment / TA win identified and articulated — note: their exact words',
+  's2_w5': 'Talent / L&D win identified and articulated — note: their exact words',
+  's2_w6': 'Performance / Comp win identified and articulated — note: their exact words',
+  's2_w7': 'IT / Technical win identified and articulated — note: their exact words',
+  's2_w8': 'CFO / Finance win identified and articulated — note: their exact words',
+  's2_v1': 'Mobile access / employee self-service value validated — note: their response',
+  's2_v2': 'Onboarding workflow value validated — note: their response',
+  's2_v3': 'Communications / announcements value validated — note: their response',
+  's2_v4': 'Integrated suite (single platform) value validated — note: their response',
+  's2_v5': 'Service model & implementation approach validated — note: their response',
+  's2_v6': 'UKG Ready differentiator 1 validated — note: differentiator name and their response',
+  's2_v7': 'UKG Ready differentiator 2 validated — note: differentiator name and their response',
+  's2_s1': 'Key strength 1 identified — note: description and validation evidence',
+  's2_s2': 'Key strength 2 identified — note: description and validation evidence',
+  's2_s3': 'Key strength 3 identified — note: description and validation evidence',
+  's2_s4': 'Key strength 4 identified — note: description and validation evidence',
+  's2_s5': 'Key strength 5 identified — note: description and validation evidence',
+  's2_rf1': 'Red flag / deal risk 1 — note: description and mitigation plan',
+  's2_rf2': 'Red flag / deal risk 2 — note: description and mitigation plan',
+  's2_rf3': 'Red flag / deal risk 3 — note: description and mitigation plan',
+  's2_rf4': 'Red flag / deal risk 4 — note: description and mitigation plan',
+  's2_rf5': 'Red flag / deal risk 5 — note: description and mitigation plan',
+  // Stage 3
+  's3_d1': 'Demoed to ALL key stakeholder personas — note: any persona not yet demoed',
+  's3_d2': 'All open items & red flags from Develop addressed — note: any unresolved items',
+  's3_d3': 'Payroll / Time requirement gaps reviewed & resolved — note: gaps or mitigation',
+  's3_d4': 'HCM requirement gaps reviewed & resolved — note: gaps or mitigation',
+  's3_d5': 'Price aligned with budget — note: any delta',
+  's3_d6': 'References offered and scheduled / completed — note: reference names and match',
+  's3_d7': 'Champion tested — note: what they shared / arranged / advocated',
+  's3_d8': 'Incumbent vendor notification period confirmed — note: notice period and contract end date',
+  // Stage 4
+  's4_c1': 'Final decision process & date confirmed — note: decision date and remaining steps',
+  's4_c2': 'Final proposal presented to Economic Buyer — note: presented to whom and when',
+  's4_c3': 'Contract presented to procurement / legal — note: sent to whom and when',
+  's4_c4': 'Contract review process & timeline known — note: who reviews, who signs, turnaround',
+  's4_c5': 'Implementation Manager introduced to key contacts pre-signature — note: confirmed with whom',
+  's4_c6': 'All sales-cycle commitments reflected in contract — note: any custom commitments',
+};
+
+const AI_SYSTEM_PROMPT = `You are a sales qualification assistant for VensureHR UKG Ready Enterprise HCM deals.
+You will receive raw account/prospect notes from a seller. Extract and structure the information to populate a Quick Assess deal qualification form.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "deal_fields": {
+    "dh-prospect": "value or null",
+    "dh-website": "value or null",
+    "dh-bc": "value or null",
+    "dh-sdr": "value or null",
+    "dh-ees": "value or null",
+    "dh-arr": "value or null",
+    "dh-close": "YYYY-MM-DD or null",
+    "dh-sc": "value or null",
+    "dh-bant-budget": "value or null",
+    "dh-bant-authority": "value or null",
+    "dh-bant-need": "value or null",
+    "dh-bant-timing": "value or null"
+  },
+  "criteria": {
+    "CRITERION_ID": {
+      "checked": true/false,
+      "note": "extracted text or null",
+      "desc": "for user-filled fields like strengths/red flags: the label/description"
+    }
+  },
+  "actions": [
+    {"status": "Open", "type": "ACTION_TYPE", "desc": "action description", "owner": "BC/SE/etc", "due": "YYYY-MM-DD or null"}
+  ],
+  "seller_notes": "any general observations not captured elsewhere or null"
+}
+
+Rules:
+- Only set checked:true if the notes clearly confirm that criterion is done/identified/complete
+- Extract exact quotes from the prospect when available for note fields
+- For red flags, set checked:false (they're open risks) and put the description in desc
+- Action types: Stakeholder Outreach, Red Flag Mitigation, Champion Development, Strength Validation, Technical Validation, Reference Management, Commercial / Legal, Other
+- Be conservative — if it's ambiguous, leave checked:false but still populate the note
+- For BANT fields: extract even partial information — budget ranges, authority by title if name unknown, need in prospect's own words, timing from any date or urgency signal mentioned
+- Return null for anything not mentioned in the notes`;
+
+let aiPendingResults = null;
+let aiImportMode = 'merge'; // 'merge' or 'replace'
+
+// ── Transcript paste modal ────────────────────────────────────────────────────
+function openTranscriptModal() {
+  document.getElementById('transcript-text').value = '';
+  document.getElementById('mode-merge').checked = true;
+  document.getElementById('transcript-overlay').classList.add('open');
+}
+function closeTranscriptModal() {
+  document.getElementById('transcript-overlay').classList.remove('open');
+}
+function handleTranscriptOverlay(e) {
+  if (e.target === document.getElementById('transcript-overlay')) closeTranscriptModal();
+}
+async function handleTranscriptSubmit() {
+  const text = document.getElementById('transcript-text').value.trim();
+  if (!text) { alert('Please paste a transcript first.'); return; }
+  const mode = document.querySelector('input[name="ai-import-mode"]:checked')?.value || 'merge';
+  aiImportMode = mode;
+  closeTranscriptModal();
+  setUploadStatus('🤖 Analyzing transcript…', 'loading');
+  try {
+    const res = await fetch('/api/interpret', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, system: AI_SYSTEM_PROMPT })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    let parsed = data.response || data;
+    if (typeof parsed === 'string') { try { parsed = JSON.parse(parsed); } catch { throw new Error('AI returned non-JSON'); } }
+    setUploadStatus('✓ Transcript analyzed — review and apply below', 'success');
+    aiPendingResults = parsed;
+    const modeBadge = document.getElementById('ai-mode-badge');
+    if (modeBadge) {
+      modeBadge.textContent = mode === 'merge' ? '🔀 Merge Mode' : '🔄 Replace Mode';
+      modeBadge.style.background = mode === 'merge' ? '#dbeafe' : '#fef3c7';
+      modeBadge.style.color = mode === 'merge' ? '#1e3a8a' : '#92400e';
+    }
+    document.getElementById('ai-filename').textContent = 'Transcript — ' + text.slice(0, 60) + '…';
+    renderAiResults(parsed);
+    document.getElementById('ai-overlay').classList.add('open');
+  } catch(e) {
+    setUploadStatus('✗ Error: ' + e.message, 'error');
+  }
+}
+
+function setUploadStatus(msg, cls) {
+  const el = document.getElementById('upload-status');
+  el.textContent = msg;
+  el.className = 'upload-status ' + cls;
+  el.style.display = msg ? '' : 'none';
+}
+
+async function handleDocUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  input.value = '';
+
+  if (typeof mammoth === 'undefined') {
+    setUploadStatus('✗ Document parser failed to load. Check your internet connection and refresh the page.', 'error');
+    return;
+  }
+
+  setUploadStatus('📄 Reading document…', 'loading');
+
+  let docText = '';
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    docText = result.value.trim();
+    if (!docText) throw new Error('Document appears to be empty or unreadable');
+  } catch(e) {
+    setUploadStatus('✗ Could not read document: ' + e.message, 'error');
+    return;
+  }
+
+  setUploadStatus('🤖 Sending to AI for interpretation… (may take 10–20s)', 'loading');
+
+  let parsed;
+  try {
+    const resp = await fetch('/api/interpret', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: docText })
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || 'Server error ' + resp.status);
+    }
+    parsed = await resp.json();
+  } catch (e) {
+    setUploadStatus('✗ Error: ' + e.message, 'error');
+    return;
+  }
+
+  setUploadStatus('✓ AI finished — review and apply below', 'success');
+  aiPendingResults = parsed;
+  aiImportMode = document.querySelector('input[name="ai-import-mode"]:checked')?.value || 'merge';
+  const modeBadge = document.getElementById('ai-mode-badge');
+  if (modeBadge) {
+    modeBadge.textContent = aiImportMode === 'merge' ? '🔀 Merge Mode' : '🔄 Replace Mode';
+    modeBadge.style.background = aiImportMode === 'merge' ? '#dbeafe' : '#fef3c7';
+    modeBadge.style.color = aiImportMode === 'merge' ? '#1e3a8a' : '#92400e';
+  }
+  document.getElementById('ai-filename').textContent = file.name;
+  renderAiResults(parsed);
+  document.getElementById('ai-overlay').classList.add('open');
+}
+
+function renderAiResults(parsed) {
+  const container = document.getElementById('ai-results');
+  container.innerHTML = '';
+  let itemCount = 0;
+
+  // Deal fields
+  const dealFields = parsed.deal_fields || {};
+  const filledDeal = Object.entries(dealFields).filter(([,v]) => v);
+  if (filledDeal.length) {
+    const hdr = document.createElement('div');
+    hdr.className = 'ai-section-hdr deal'; hdr.textContent = 'Deal Information';
+    container.appendChild(hdr);
+    filledDeal.forEach(([key, val]) => {
+      const label = AI_CRITERIA_MAP[key] || key;
+      container.appendChild(makeAiItem('deal__' + key, label.split(' — ')[0], val, null));
+      itemCount++;
+    });
+  }
+
+  // Criteria by stage
+  const stageInfo = [
+    {id:'s1', cls:'s1', label:'Stage 1 · Qualify'},
+    {id:'s2', cls:'s2', label:'Stage 2 · Develop'},
+    {id:'s3', cls:'s3', label:'Stage 3 · Prove'},
+    {id:'s4', cls:'s4', label:'Stage 4 · Negotiate'},
+  ];
+  const criteria = parsed.criteria || {};
+
+  stageInfo.forEach(st => {
+    const stageCrits = Object.entries(criteria).filter(([k]) => k.startsWith(st.id + '_') && (criteria[k].checked || criteria[k].note || criteria[k].desc));
+    if (!stageCrits.length) return;
+    const hdr = document.createElement('div');
+    hdr.className = 'ai-section-hdr ' + st.cls; hdr.textContent = st.label;
+    container.appendChild(hdr);
+    stageCrits.forEach(([key, val]) => {
+      const fullLabel = AI_CRITERIA_MAP[key] || key;
+      const label = fullLabel.split(' — ')[0];
+      const noteHint = fullLabel.includes(' — note:') ? fullLabel.split(' — note:')[1] : null;
+      const displayNote = val.note || (val.checked ? '✓ Confirmed' : null);
+      container.appendChild(makeAiItem('crit__' + key, label, val.desc || (val.checked ? '✓ Confirmed' : '—'), displayNote, val.checked));
+      itemCount++;
+    });
+  });
+
+  // Actions
+  const acts = parsed.actions || [];
+  if (acts.length) {
+    const hdr = document.createElement('div');
+    hdr.className = 'ai-section-hdr actions'; hdr.textContent = 'Suggested Actions';
+    container.appendChild(hdr);
+    acts.forEach((a, i) => {
+      container.appendChild(makeAiItem('action__' + i, a.type || 'Action', a.desc, (a.owner ? 'Owner: ' + a.owner : '') + (a.due ? '  Due: ' + a.due : ''), true));
+      itemCount++;
+    });
+  }
+
+  // Seller notes
+  if (parsed.seller_notes) {
+    const hdr = document.createElement('div');
+    hdr.className = 'ai-section-hdr deal'; hdr.textContent = 'Seller Notes';
+    container.appendChild(hdr);
+    container.appendChild(makeAiItem('notes__0', 'General observations', parsed.seller_notes, null, true));
+    itemCount++;
+  }
+
+  if (itemCount === 0) {
+    container.innerHTML = '<div class="ai-empty">AI didn\'t find any matching information in the document. Try a richer notes file.</div>';
+  }
+}
+
+function makeAiItem(id, label, value, note, checked) {
+  const div = document.createElement('div');
+  div.className = 'ai-item';
+  div.onclick = () => { const cb = div.querySelector('input'); if (cb) cb.checked = !cb.checked; };
+  const chkEl = document.createElement('input');
+  chkEl.type = 'checkbox';
+  chkEl.id = 'ai-chk-' + id;
+  chkEl.checked = checked !== false;
+  chkEl.onclick = e => e.stopPropagation();
+  const body = document.createElement('div');
+  body.className = 'ai-item-body';
+  body.innerHTML = `<div class="ai-item-q">${label}</div>`
+    + (value ? `<div class="ai-item-val">${value}</div>` : '')
+    + (note  ? `<div class="ai-item-note">${note}</div>` : '');
+  div.appendChild(chkEl);
+  div.appendChild(body);
+  return div;
+}
+
+function applyAiResults() {
+  if (!aiPendingResults) return;
+  const parsed = aiPendingResults;
+  const isMerge = aiImportMode !== 'replace';
+
+  // Apply deal fields
+  // Merge: only fill empty fields | Replace: overwrite all
+  Object.entries(parsed.deal_fields || {}).forEach(([key, val]) => {
+    if (!val) return;
+    const chkId = 'ai-chk-deal__' + key;
+    const chkEl = document.getElementById(chkId);
+    if (chkEl && !chkEl.checked) return;
+    const el = document.getElementById(key);
+    if (!el) return;
+    if (isMerge && el.value.trim()) return; // merge: skip if already filled
+    el.value = val;
+  });
+
+  // Apply criteria
+  Object.entries(parsed.criteria || {}).forEach(([key, val]) => {
+    const chkId = 'ai-chk-crit__' + key;
+    const chkEl = document.getElementById(chkId);
+    if (chkEl && !chkEl.checked) return;
+
+    // Checkbox: merge = only check if not already checked; replace = set as AI says
+    const cb = document.getElementById('chk-' + key);
+    if (cb) {
+      if (isMerge) { if (val.checked) cb.checked = true; }
+      else { cb.checked = val.checked; }
+    }
+
+    // Note: merge = append if new info differs; replace = overwrite
+    const nts = document.getElementById('nts-' + key);
+    if (nts && val.note) {
+      if (isMerge) {
+        if (!nts.value.trim()) {
+          nts.value = val.note;
+        } else if (!nts.value.includes(val.note.slice(0, 30))) {
+          // Append if not already present
+          nts.value = nts.value.trimEnd() + '\n— Update: ' + val.note;
+        }
+      } else {
+        nts.value = val.note;
+      }
+    }
+
+    // Desc (user-filled labels like strengths/red flags)
+    const dsc = document.getElementById('dsc-' + key);
+    if (dsc && val.desc) {
+      if (isMerge && dsc.value.trim()) { /* keep existing label */ }
+      else dsc.value = val.desc;
+    }
+  });
+
+  // Apply actions — always append (never delete existing)
+  (parsed.actions || []).forEach((a, i) => {
+    const chkId = 'ai-chk-action__' + i;
+    const chkEl = document.getElementById(chkId);
+    if (chkEl && !chkEl.checked) return;
+    addAction({ status: a.status || 'Open', type: a.type || '', desc: a.desc || '', owner: a.owner || '', due: a.due || '' });
+  });
+
+  // Apply seller notes
+  if (parsed.seller_notes) {
+    const chkEl = document.getElementById('ai-chk-notes__0');
+    if (!chkEl || chkEl.checked) {
+      const sn = document.getElementById('seller-notes');
+      if (sn) {
+        if (isMerge) {
+          sn.value = (sn.value ? sn.value.trimEnd() + '\n\n--- Transcript Update ---\n' : '') + parsed.seller_notes;
+        } else {
+          sn.value = parsed.seller_notes;
+        }
+      }
+    }
+  }
+
+  updateAll();
+  closeAiModal();
+  setUploadStatus('✓ Applied to form (' + (isMerge ? 'merged' : 'replaced') + ')', 'success');
+}
+
+function closeAiModal() {
+  document.getElementById('ai-overlay').classList.remove('open');
+  aiPendingResults = null;
+}
+
+// API key modal
+function showApiKeyModal() {
+  const existing = localStorage.getItem('qa_openai_key') || '';
+  document.getElementById('ak-input').value = existing ? '••••••••' + existing.slice(-4) : '';
+  document.getElementById('ak-status').textContent = existing ? '✓ Key is set (ends in …' + existing.slice(-4) + ')' : '';
+  document.getElementById('ak-overlay').classList.add('open');
+}
+function closeApiKeyModal() { document.getElementById('ak-overlay').classList.remove('open'); }
+function handleAKOverlay(e) { if (e.target === document.getElementById('ak-overlay')) closeApiKeyModal(); }
+function saveApiKey() {
+  const val = document.getElementById('ak-input').value.trim();
+  if (!val || val.startsWith('••')) { document.getElementById('ak-status').textContent = 'Enter a new key to save'; return; }
+  localStorage.setItem('qa_openai_key', val);
+  document.getElementById('ak-status').textContent = '✓ Saved (ends in …' + val.slice(-4) + ')';
+  setTimeout(closeApiKeyModal, 800);
+}
+function clearApiKey() {
+  localStorage.removeItem('qa_openai_key');
+  document.getElementById('ak-input').value = '';
+  document.getElementById('ak-status').textContent = 'Key cleared';
+}
+
+// ── My Deals ──────────────────────────────────────────────────────────────────
+
+const DEALS_KEY = 'qa_my_deals';
+const STAGE_NAMES = ['Pre-Qualify','Stage 1 — Qualify','Stage 2 — Develop','Stage 3 — Prove','Stage 4 — Negotiate'];
+
+function loadDeals() {
+  try { return JSON.parse(localStorage.getItem(DEALS_KEY) || '[]'); } catch { return []; }
+}
+
+function saveDeals(deals) {
+  localStorage.setItem(DEALS_KEY, JSON.stringify(deals));
+}
+
+function saveDeal() {
+  const prospect = (document.getElementById('dh-prospect').value || '').trim();
+  if (!prospect) {
+    showConfirm('⚠ Enter a company name first');
+    return;
+  }
+
+  // Build the shareable URL (same logic as copyLink)
+  const state = getState();
+  delete state['h_prospect'];
+  const base    = location.href.split('?')[0].split('#')[0];
+  const coParam = '?co=' + encodeURIComponent(prospect);
+  const hash    = '#' + encodeURIComponent(JSON.stringify(state));
+  const url     = base + coParam + hash;
+
+  const stage   = calcStage();
+  const total   = CRITS.length;
+  const done    = CRITS.filter(c => chk(c.id)).length;
+  const pct     = Math.round(done / total * 100);
+  const bc      = document.getElementById('dh-bc').value.trim();
+  const arr     = document.getElementById('dh-arr').value.trim();
+
+  const deals = loadDeals();
+  // Update existing deal for same company, or add new
+  const existingIdx = deals.findIndex(d => d.prospect.toLowerCase() === prospect.toLowerCase());
+  const entry = {
+    id:       existingIdx >= 0 ? deals[existingIdx].id : Date.now(),
+    prospect,
+    stage,
+    pct,
+    bc,
+    arr,
+    saved:    new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+    url,
+  };
+
+  if (existingIdx >= 0) deals[existingIdx] = entry;
+  else deals.unshift(entry);
+
+  saveDeals(deals);
+  showConfirm('💾 Deal saved!');
+}
+
+function openMyDeals() {
+  renderMyDeals();
+  document.getElementById('md-overlay').classList.add('open');
+}
+
+function closeMyDeals() {
+  document.getElementById('md-overlay').classList.remove('open');
+}
+
+function handleMDOverlay(e) {
+  if (e.target === document.getElementById('md-overlay')) closeMyDeals();
+}
+
+function deleteDeal(id) {
+  const deals = loadDeals().filter(d => d.id !== id);
+  saveDeals(deals);
+  renderMyDeals();
+}
+
+function openDeal(url) {
+  closeMyDeals();
+  location.href = url;
+}
+
+function renderMyDeals() {
+  const deals = loadDeals();
+  const list  = document.getElementById('md-list');
+
+  if (deals.length === 0) {
+    list.innerHTML = '<div class="md-empty">No deals saved yet — open a deal and click 💾 Save Deal.</div>';
+    return;
+  }
+
+  const scroll = document.createElement('div');
+  scroll.className = 'md-list-scroll';
+
+  deals.forEach(d => {
+    const stageCls = 'md-s' + d.stage;
+    const row = document.createElement('div');
+    row.className = 'md-deal-row';
+    row.innerHTML = `
+      <div>
+        <div class="md-deal-name">
+          ${d.prospect}
+          <span class="md-stage-chip ${stageCls}">${STAGE_NAMES[d.stage]}</span>
+        </div>
+        <div class="md-deal-meta">
+          ${d.pct}% complete
+          ${d.bc  ? ' · BC: ' + d.bc : ''}
+          ${d.arr ? ' · ARR: ' + d.arr : ''}
+          · Saved ${d.saved}
+        </div>
+      </div>
+      <div class="md-deal-actions">
+        <button class="md-open-btn" onclick="openDeal('${d.url.replace(/'/g, "\\'")}')">Open</button>
+        <button class="md-del-btn" onclick="deleteDeal(${d.id})" title="Remove">✕</button>
+      </div>
+    `;
+    scroll.appendChild(row);
+  });
+
+  list.innerHTML = '';
+  list.appendChild(scroll);
+}
+
+// ── AI Action Items store ─────────────────────────────────────────────────────
+
+let aiActionItems = []; // {id, desc, owner, due, priority, context, source, source_label, done, resolve_note, id_str}
+let aiActionsTab = 'all';
+
+const SOURCE_LABELS = { ia:'IA', diagnostic:'Diagnostic', demo:'Demo', email:'Email', manual:'Manual' };
+const PRIORITY_ORDER = { high:0, medium:1, low:2 };
+
+function aiActionId() { return 'ai_' + Date.now() + '_' + Math.floor(Math.random()*10000); }
+
+function pushAIActions(items, source) {
+  const label = SOURCE_LABELS[source] || source;
+  items.forEach(item => {
+    aiActionItems.push({
+      id: aiActionId(),
+      id_str: null, // filled below
+      desc: item.item || item.desc || '',
+      owner: item.owner || '',
+      due: item.due || '',
+      priority: (item.priority || 'medium').toLowerCase(),
+      context: item.context || '',
+      source,
+      source_label: label,
+      done: false,
+      resolve_note: ''
+    });
+  });
+  // assign readable id_str after push
+  aiActionItems.forEach((a, i) => { if (!a.id_str) a.id_str = String(i + 1); });
+  renderAIActions();
+}
+
+function setAIActionsTab(tab) {
+  aiActionsTab = tab;
+  document.querySelectorAll('.ai-actions-tab').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('aitab-' + tab);
+  if (btn) btn.classList.add('active');
+  renderAIActions();
+}
+
+function renderAIActions() {
+  const el = document.getElementById('ai-actions-list');
+  if (!el) return;
+  el.innerHTML = '';
+
+  let items = aiActionItems;
+
+  if (aiActionsTab === 'done') {
+    items = items.filter(a => a.done);
+  } else if (aiActionsTab === 'all') {
+    items = items.filter(a => !a.done);
+  } else {
+    items = items.filter(a => a.source === aiActionsTab && !a.done);
+  }
+
+  if (aiActionsTab === 'all') {
+    // Group by source
+    const sources = ['ia','diagnostic','demo','email','manual'];
+    sources.forEach(src => {
+      const group = items.filter(a => a.source === src);
+      if (!group.length) return;
+      const sec = document.createElement('div');
+      sec.className = 'ai-source-section';
+      const lbl = document.createElement('div');
+      lbl.className = 'ai-source-label';
+      lbl.innerHTML = `${SOURCE_LABELS[src]} <span class="ai-source-count">${group.length}</span>`;
+      sec.appendChild(lbl);
+      group.sort((a,b) => (PRIORITY_ORDER[a.priority]||1) - (PRIORITY_ORDER[b.priority]||1))
+          .forEach(a => sec.appendChild(buildAIActionRow(a)));
+      el.appendChild(sec);
+    });
+  } else {
+    items.sort((a,b) => (PRIORITY_ORDER[a.priority]||1) - (PRIORITY_ORDER[b.priority]||1))
+         .forEach(a => el.appendChild(buildAIActionRow(a)));
+  }
+
+  if (el.children.length === 0) {
+    el.innerHTML = `<div class="ai-actions-empty">${aiActionsTab === 'done' ? 'No closed items yet' : 'No open items'}</div>`;
+  }
+}
+
+function buildAIActionRow(item) {
+  const row = document.createElement('div');
+  row.className = 'ai-action-item' + (item.done ? ' done' : '');
+  row.id = 'airow-' + item.id;
+
+  const badges = [
+    item.owner   ? `<span class="ai-action-badge owner">${escH(item.owner)}</span>` : '',
+    item.due     ? `<span class="ai-action-badge due">📅 ${escH(item.due)}</span>` : '',
+    item.priority? `<span class="ai-action-badge ${item.priority}">${item.priority.toUpperCase()}</span>` : '',
+    `<span class="ai-action-badge source">${escH(item.source_label)}</span>`,
+  ].filter(Boolean).join('');
+
+  row.innerHTML = `
+    <input type="checkbox" class="ai-action-check" ${item.done ? 'checked' : ''}
+      onchange="toggleAIAction('${item.id}', this.checked)">
+    <div class="ai-action-main">
+      <div class="ai-action-desc">${escH(item.desc)}</div>
+      ${item.context ? `<div class="ai-action-context">${escH(item.context)}</div>` : ''}
+      ${item.resolve_note ? `<div class="ai-action-resolve-note">✓ ${escH(item.resolve_note)}</div>` : ''}
+      <div class="ai-action-meta">${badges}</div>
+    </div>
+    <div class="ai-action-right">
+      <button class="ai-action-del" onclick="deleteAIAction('${item.id}')" title="Remove">✕</button>
+    </div>`;
+  return row;
+}
+
+function toggleAIAction(id, checked) {
+  const item = aiActionItems.find(a => a.id === id);
+  if (item) { item.done = checked; renderAIActions(); }
+}
+
+function deleteAIAction(id) {
+  aiActionItems = aiActionItems.filter(a => a.id !== id);
+  renderAIActions();
+}
+
+function addManualAIAction() {
+  const input = document.getElementById('ai-action-add-input');
+  const ownerEl = document.getElementById('ai-action-add-owner');
+  const desc = input.value.trim();
+  if (!desc) return;
+  pushAIActions([{ item: desc, owner: ownerEl.value, priority: 'medium', context: '' }], 'manual');
+  input.value = '';
+  ownerEl.value = '';
+}
+
+async function runEmailParse() {
+  const text = document.getElementById('ai-email-text').value.trim();
+  if (!text) { alert('Please paste an email first.'); return; }
+
+  const btn = document.getElementById('ai-email-btn');
+  const statusEl = document.getElementById('ai-email-status');
+  btn.disabled = true; btn.textContent = '⏳ Parsing…';
+  statusEl.textContent = 'Analyzing email…'; statusEl.className = 'ai-email-status loading';
+
+  const openItems = aiActionItems.filter(a => !a.done).map(a => ({
+    id_str: a.id_str || a.id,
+    desc: a.desc,
+    owner: a.owner,
+    source_label: a.source_label
+  }));
+
+  try {
+    const res = await fetch('/api/email-parse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, open_items: openItems })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // Close resolved items
+    let closedCount = 0;
+    (data.resolved_ids || []).forEach(rid => {
+      const item = aiActionItems.find(a => a.id_str === String(rid) || a.id === String(rid));
+      if (item) {
+        item.done = true;
+        item.resolve_note = (data.resolved_notes && data.resolved_notes[rid]) || 'Resolved via email';
+        closedCount++;
+      }
+    });
+
+    // Add new items from email
+    if (data.new_actions && data.new_actions.length > 0) {
+      pushAIActions(data.new_actions, 'email');
+    } else {
+      renderAIActions();
+    }
+
+    const msg = [
+      closedCount > 0 ? `${closedCount} item${closedCount>1?'s':''} closed` : '',
+      data.new_actions?.length > 0 ? `${data.new_actions.length} new item${data.new_actions.length>1?'s':''} added` : '',
+    ].filter(Boolean).join(', ');
+
+    statusEl.textContent = '✓ ' + (data.summary || msg || 'Email processed');
+    statusEl.className = 'ai-email-status success';
+    document.getElementById('ai-email-text').value = '';
+
+    // Auto-switch to All Open to show changes
+    setAIActionsTab('all');
+  } catch(e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'ai-email-status error';
+  } finally {
+    btn.disabled = false; btn.textContent = '📧 Parse Email';
+  }
+}
+
+function escH(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Hook into analytics runs — auto-push action items after each transcript analysis
+const _origRunIA = typeof runIAAnalysis !== 'undefined' ? runIAAnalysis : null;
+// Hooks are applied inline at the call sites below via wrapper functions
+
+// ── Load .txt file into any textarea ─────────────────────────────────────────
+function loadTxtFile(input, targetId) {
+  const file = input.files[0];
+  if (!file) return;
+  readFileIntoTextarea(file, targetId);
+  input.value = ''; // reset so same file can be re-loaded
+}
+
+function readFileIntoTextarea(file, targetId) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    const ta = document.getElementById(targetId);
+    if (ta) { ta.value = e.target.result; ta.focus(); }
+  };
+  reader.onerror = () => alert('Could not read file — try copy-paste instead.');
+  reader.readAsText(file, 'UTF-8');
+}
+
+// ── Drag-and-drop onto any transcript textarea ────────────────────────────────
+
+// Prevent the browser from navigating to the dropped file at document level
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop',     e => e.preventDefault());
+
+function enableTextareaDrop(textareaId) {
+  const ta = document.getElementById(textareaId);
+  if (!ta) return;
+
+  const highlight = on => {
+    ta.style.borderColor  = on ? 'var(--orange)' : '';
+    ta.style.boxShadow    = on ? '0 0 0 3px rgba(224,82,6,0.2)' : '';
+    ta.style.background   = on ? '#fff8f4' : '';
+  };
+
+  ta.addEventListener('dragenter', e => { e.preventDefault(); e.stopPropagation(); highlight(true);  });
+  ta.addEventListener('dragover',  e => { e.preventDefault(); e.stopPropagation(); highlight(true);  });
+  ta.addEventListener('dragleave', e => { e.preventDefault(); e.stopPropagation(); highlight(false); });
+  ta.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    highlight(false);
+    const file = (e.dataTransfer.files || [])[0];
+    if (!file) return;
+    if (file.type.startsWith('text/') || /\.(txt|md|csv|eml|log)$/i.test(file.name)) {
+      readFileIntoTextarea(file, textareaId);
+    } else {
+      alert('Drop a plain text file (.txt, .md, .csv) — for .docx use the Upload .docx button.');
+    }
+  });
+}
+
+// Attach to all textarea targets immediately (script runs after DOM is built)
+document.addEventListener('DOMContentLoaded', () => {
+  ['ia-transcript','diag-transcript','demo-transcript','transcript-text','ai-email-text']
+    .forEach(id => enableTextareaDrop(id));
+});
+// Also run now in case DOMContentLoaded already fired
+['ia-transcript','diag-transcript','demo-transcript','transcript-text','ai-email-text']
+  .forEach(id => enableTextareaDrop(id));
+
+// ── Silent checklist update from transcript ───────────────────────────────────
+// Calls /api/interpret and silently merges results into the checklist (merge mode,
+// no review modal). Runs in parallel with every analysis call.
+
+async function silentChecklistUpdate(text) {
+  try {
+    const res = await fetch('/api/interpret', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) return;
+    const parsed = await res.json();
+    if (!parsed || parsed.error) return;
+
+    // Apply deal fields — merge: skip if already filled
+    Object.entries(parsed.deal_fields || {}).forEach(([key, val]) => {
+      if (!val) return;
+      const el = document.getElementById(key);
+      if (el && !el.value.trim()) el.value = val;
+    });
+
+    // Apply criteria — merge mode
+    Object.entries(parsed.criteria || {}).forEach(([key, val]) => {
+      // Checkbox: only advance (check if AI says done, never uncheck)
+      const cb = document.getElementById('chk-' + key);
+      if (cb && val.checked) cb.checked = true;
+
+      // Note: append if new content differs from what's there
+      const nts = document.getElementById('nts-' + key);
+      if (nts && val.note) {
+        if (!nts.value.trim()) {
+          nts.value = val.note;
+        } else if (!nts.value.includes(val.note.slice(0, 30))) {
+          nts.value = nts.value.trimEnd() + '\n— ' + val.note;
+        }
+      }
+
+      // Desc fields (strengths, red flags, differentiators): only fill if blank
+      const dsc = document.getElementById('dsc-' + key);
+      if (dsc && val.desc && !dsc.value.trim()) dsc.value = val.desc;
+    });
+
+    updateAll();
+    console.log('[Checklist] Silent update applied from transcript.');
+  } catch(e) {
+    console.warn('[Checklist] Silent update failed:', e.message);
+  }
+}
+
+async function runIAAndExtract() {
+  await runIAAnalysis();
+  const text = document.getElementById('ia-transcript')?.value?.trim();
+  if (!text) return;
+  // Run checklist update + action extract in parallel
+  await Promise.allSettled([
+    silentChecklistUpdate(text),
+    fetch('/api/action-extract', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text, meeting_type: 'ia' })
+    }).then(r => r.json()).then(data => {
+      if (data.action_items?.length) pushAIActions(data.action_items, 'ia');
+    })
+  ]);
+}
+
+async function runDiagnosticAndExtract() {
+  await runDiagnosticAnalysis();
+  const text = document.getElementById('diag-transcript')?.value?.trim();
+  if (!text) return;
+  await Promise.allSettled([
+    silentChecklistUpdate(text),
+    fetch('/api/action-extract', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text, meeting_type: 'diagnostic' })
+    }).then(r => r.json()).then(data => {
+      if (data.action_items?.length) pushAIActions(data.action_items, 'diagnostic');
+    })
+  ]);
+}
+
+async function runDemoAndExtract() {
+  await runDemoAnalysis();
+  const text = document.getElementById('demo-transcript')?.value?.trim();
+  if (!text) return;
+  await Promise.allSettled([
+    silentChecklistUpdate(text),
+    fetch('/api/action-extract', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text, meeting_type: 'demo' })
+    }).then(r => r.json()).then(data => {
+      if (data.action_items?.length) pushAIActions(data.action_items, 'demo');
+    })
+  ]);
+}
+
+// ── Deal Analytics: Demo Analysis ────────────────────────────────────────────
+
+async function runDemoAnalysis() {
+  const text = document.getElementById('demo-transcript').value.trim();
+  if (!text) { alert('Please paste a Demo transcript first.'); return; }
+
+  const btn      = document.getElementById('demo-run-btn');
+  const statusEl = document.getElementById('demo-status');
+  const resultsEl= document.getElementById('demo-results');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+  statusEl.textContent = 'Sending transcript to AI…';
+  statusEl.className = 'ia-status loading';
+  resultsEl.classList.remove('visible');
+
+  try {
+    const res = await fetch('/api/demo-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    renderDemoResults(data);
+    statusEl.textContent = '✓ Analysis complete';
+    statusEl.className = 'ia-status success';
+    resultsEl.classList.add('visible');
+  } catch (e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'ia-status error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze Demo';
+  }
+}
+
+function renderDemoResults(data) {
+  // Summary
+  document.getElementById('demo-summary').textContent = data.summary || '';
+
+  // Functional areas
+  const areasEl = document.getElementById('demo-areas');
+  areasEl.innerHTML = '';
+  (data.functional_areas || []).forEach(area => {
+    const hasPos = area.positive && area.positive.length > 0;
+    const hasNeg = area.negative && area.negative.length > 0;
+    const hasNeu = area.neutral  && area.neutral.length  > 0;
+    if (!hasPos && !hasNeg && !hasNeu) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'demo-area';
+
+    wrap.innerHTML = `<div class="demo-area-head">${esc(area.area)}</div>`;
+
+    const row = document.createElement('div');
+    row.className = 'demo-sentiment-row';
+
+    const makeSentCol = (items, cls, label) => {
+      const col = document.createElement('div');
+      col.className = 'demo-sentiment-col';
+      col.innerHTML = `<div class="demo-col-label ${cls}">${label}</div>`;
+      if (!items || items.length === 0) {
+        col.innerHTML += '<div style="font-size:0.72rem;color:#d1d5db;font-style:italic;">—</div>';
+      } else {
+        items.forEach(item => {
+          const d = document.createElement('div');
+          d.className = 'demo-quote-item';
+          d.innerHTML = (item.quote ? `<div class="demo-quote">${esc(item.quote)}</div>` : '')
+            + (item.context ? `<div class="demo-context">${esc(item.context)}</div>` : '');
+          col.appendChild(d);
+        });
+      }
+      return col;
+    };
+
+    row.appendChild(makeSentCol(area.positive, 'pos', '✅ Positive'));
+    row.appendChild(makeSentCol(area.negative, 'neg', '❌ Negative'));
+    row.appendChild(makeSentCol(area.neutral,  'neu', '⚠️ Needs Exploration'));
+
+    wrap.appendChild(row);
+    areasEl.appendChild(wrap);
+  });
+
+  // Open items
+  const oi = data.open_items || {};
+  const openWrap = document.getElementById('demo-open-wrap');
+  const hasOpen = (oi.unanswered||[]).length + (oi.answered||[]).length + (oi.followup||[]).length > 0;
+  openWrap.style.display = hasOpen ? '' : 'none';
+
+  const renderOpenSection = (secId, listId, items, renderFn) => {
+    const sec = document.getElementById(secId);
+    const list = document.getElementById(listId);
+    if (!items || items.length === 0) { sec.style.display = 'none'; return; }
+    sec.style.display = '';
+    list.innerHTML = '';
+    items.forEach(item => {
+      const d = document.createElement('div');
+      d.className = 'demo-open-item';
+      d.innerHTML = renderFn(item);
+      list.appendChild(d);
+    });
+  };
+
+  renderOpenSection('demo-unanswered-sec', 'demo-unanswered', oi.unanswered, item =>
+    `<div class="demo-open-q">${esc(item.question)}</div>`
+    + (item.asked_by ? `<div class="demo-open-meta">Asked by: ${esc(item.asked_by)}</div>` : '')
+  );
+  renderOpenSection('demo-answered-sec', 'demo-answered', oi.answered, item =>
+    `<div class="demo-open-q">${esc(item.question)}</div>`
+    + (item.answer_summary ? `<div class="demo-open-meta">Answer: ${esc(item.answer_summary)}</div>` : '')
+  );
+  renderOpenSection('demo-followup-sec', 'demo-followup', oi.followup, item =>
+    `<div class="demo-open-q">${esc(item.item)}</div>`
+    + [item.owner ? 'Owner: '+item.owner : '', item.due ? 'Due: '+item.due : ''].filter(Boolean).map(s => `<div class="demo-open-meta">${esc(s)}</div>`).join('')
+  );
+
+  // Other / catch-all
+  const other = data.other || [];
+  const otherWrap = document.getElementById('demo-other-wrap');
+  const otherEl   = document.getElementById('demo-other');
+  otherWrap.style.display = other.length ? '' : 'none';
+  otherEl.innerHTML = '';
+  other.forEach(item => {
+    const d = document.createElement('div');
+    d.className = 'demo-other-item';
+    d.innerHTML = (item.topic ? `<span class="demo-other-topic">${esc(item.topic)}</span>` : '')
+      + (item.quote   ? `<div class="demo-other-quote">${esc(item.quote)}</div>` : '')
+      + (item.context ? `<div class="demo-other-context">${esc(item.context)}</div>` : '');
+    otherEl.appendChild(d);
+  });
+
+  document.getElementById('demo-timestamp').textContent = 'Analyzed ' + new Date().toLocaleString();
+}
+
+// ── Deal Analytics: Diagnostic Analysis ──────────────────────────────────────
+
+const DIAG_MODULE_META = [
+  { key: 'general',            label: 'General / Overall',         icon: '🏢' },
+  { key: 'payroll',            label: 'Payroll',                   icon: '💰' },
+  { key: 'time_and_labor',     label: 'Time & Labor',              icon: '⏱' },
+  { key: 'applicant_tracking', label: 'Applicant Tracking (ATS)',  icon: '🔍' },
+  { key: 'onboarding',         label: 'Onboarding',                icon: '🚀' },
+  { key: 'general_hr',         label: 'General HR',                icon: '👥' },
+  { key: 'performance',        label: 'Performance Management',    icon: '📈' },
+  { key: 'compensation',       label: 'Compensation',              icon: '💵' },
+  { key: 'benefits_enrollment',label: 'Benefits Enrollment',       icon: '🏥' },
+  { key: 'carrier_feeds',      label: 'Carrier Feeds',             icon: '🔗' },
+  { key: 'retirement_401k',    label: '401(k) / Retirement',       icon: '🏦' },
+  { key: 'reporting_analytics',label: 'Reporting & Analytics',     icon: '📊' },
+  { key: 'compliance',         label: 'Compliance',                icon: '⚖️' },
+  { key: 'customer_service',   label: 'Customer Service',          icon: '🎧' },
+  { key: 'emphasized',         label: 'Emphasized / Repeated',     icon: '⭐' },
+];
+
+const DIAG_SIGNAL_LABELS = {
+  pain:     '🔴 Pain',
+  positive: '🟢 Positive',
+  neutral:  '⚪ Neutral',
+  emphasis: '🟡 Emphasis',
+};
+
+async function runDiagnosticAnalysis() {
+  const text = document.getElementById('diag-transcript').value.trim();
+  if (!text) { alert('Please paste a Diagnostic transcript first.'); return; }
+
+  const btn      = document.getElementById('diag-run-btn');
+  const statusEl = document.getElementById('diag-status');
+  const resultsEl= document.getElementById('diag-results');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+  statusEl.textContent = 'Sending transcript to AI…';
+  statusEl.className = 'ia-status loading';
+  resultsEl.classList.remove('visible');
+
+  try {
+    const res = await fetch('/api/diagnostic-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    renderDiagnosticResults(data);
+    statusEl.textContent = '✓ Analysis complete';
+    statusEl.className = 'ia-status success';
+    resultsEl.classList.add('visible');
+  } catch (e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'ia-status error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze Diagnostic';
+  }
+}
+
+function renderDiagnosticResults(data) {
+  // Summary
+  document.getElementById('diag-summary').textContent = data.summary || '';
+
+  // Module grid — only render modules with actual content
+  const grid = document.getElementById('diag-module-grid');
+  grid.innerHTML = '';
+  const modules = data.modules || {};
+
+  DIAG_MODULE_META.forEach(meta => {
+    const mod = modules[meta.key];
+    if (!mod || !mod.summary) return; // skip empty modules
+
+    const signal = (mod.signal || 'neutral').toLowerCase();
+    const isEmphasis = meta.key === 'emphasized';
+
+    const card = document.createElement('div');
+    card.className = 'diag-module' + (isEmphasis ? ' emphasis-module' : '');
+
+    const signalLabel = DIAG_SIGNAL_LABELS[signal] || '';
+    card.innerHTML = `
+      <div class="diag-module-head">
+        <span>${meta.icon} ${meta.label}</span>
+        ${signal && signal !== 'null' ? `<span class="diag-signal ${signal}">${signalLabel}</span>` : ''}
+      </div>
+      <div class="diag-module-body">
+        <div class="diag-summary">${esc(mod.summary)}</div>
+        ${(mod.quotes || []).map(q => `<div class="diag-quote">${esc(q)}</div>`).join('')}
+      </div>`;
+
+    grid.appendChild(card);
+  });
+
+  if (grid.children.length === 0) {
+    grid.innerHTML = '<div class="ia-empty" style="grid-column:1/-1;">No module-level data found in transcript.</div>';
+  }
+
+  document.getElementById('diag-timestamp').textContent =
+    'Analyzed ' + new Date().toLocaleString();
+}
+
+// ── Deal Analytics: IA Analysis ───────────────────────────────────────────────
+
+async function runIAAnalysis() {
+  const text = document.getElementById('ia-transcript').value.trim();
+  if (!text) { alert('Please paste an IA transcript first.'); return; }
+
+  const btn = document.getElementById('ia-run-btn');
+  const statusEl = document.getElementById('ia-status');
+  const resultsEl = document.getElementById('ia-results');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Analyzing…';
+  statusEl.textContent = 'Sending transcript to AI…';
+  statusEl.className = 'ia-status loading';
+  resultsEl.classList.remove('visible');
+
+  try {
+    const res = await fetch('/api/ia-analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    renderIAResults(data);
+    statusEl.textContent = '✓ Analysis complete';
+    statusEl.className = 'ia-status success';
+    resultsEl.classList.add('visible');
+  } catch (e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.className = 'ia-status error';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Analyze IA';
+  }
+}
+
+function renderIAResults(data) {
+  // Summary
+  const sumEl = document.getElementById('ia-summary');
+  sumEl.textContent = data.summary || '';
+
+  // Goals
+  const goalsEl = document.getElementById('ia-goals-body');
+  goalsEl.innerHTML = '';
+  const goals = data.project_goals || [];
+  if (goals.length === 0) {
+    goalsEl.innerHTML = '<div class="ia-empty">No project goals identified</div>';
+  } else {
+    goals.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'ia-item';
+      div.innerHTML = `<div class="ia-goal-text">${esc(g.goal)}</div>`
+        + (g.quote ? `<div class="ia-goal-quote">${esc(g.quote)}</div>` : '');
+      goalsEl.appendChild(div);
+    });
+  }
+
+  // Sentiment cards
+  renderIACard('ia-positive-body', data.positive || [], 'quote', 'context');
+  renderIACard('ia-negative-body', data.negative || [], 'quote', 'context');
+  renderIACard('ia-concerns-body', data.concerns || [], 'quote', 'context');
+
+  // Timestamp
+  document.getElementById('ia-timestamp').textContent =
+    'Analyzed ' + new Date().toLocaleString();
+}
+
+function renderIACard(elId, items, quoteKey, contextKey) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  if (!items.length) {
+    el.innerHTML = '<div class="ia-empty">None identified</div>';
+    return;
+  }
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'ia-item';
+    div.innerHTML = (item[quoteKey] ? `<div class="ia-quote">${esc(item[quoteKey])}</div>` : '')
+      + (item[contextKey] ? `<div class="ia-context">${esc(item[contextKey])}</div>` : '');
+    el.appendChild(div);
+  });
+}
+
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderActions();
+restoreFromURL();
+updateAll();
+</script>
+</body>
+</html>
+<!-- build: 1789665843 -->
