@@ -9,6 +9,11 @@ import * as diagnosticAnalysis from './functions/api/diagnostic-analysis.js';
 import * as demoAnalysis from './functions/api/demo-analysis.js';
 import * as emailParse from './functions/api/email-parse.js';
 import * as actionExtract from './functions/api/action-extract.js';
+import * as kbAsk from './functions/api/kb-ask.js';
+import { dealsHandler } from './functions/api/deals.js';
+import { actionsHandler } from './functions/api/actions.js';
+import { getPool, initSchema } from './db.js';
+import { loadKB, getFullKB, getRelevantContext, extractKeywords } from './kb.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,34 +23,17 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
+// ── CORS ──────────────────────────────────────────────────────────────────────
 function cors(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(204).end();
   next();
 }
 app.use(cors);
 
-function makeRequest(req) {
-  return {
-    json: async () => req.body,
-    text: async () => typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}),
-    method: req.method,
-    url: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
-    headers: req.headers,
-  };
-}
-
-class NodeResponse {
-  constructor(body, init = {}) {
-    this.body = body;
-    this.status = init.status || 200;
-    this.headers = init.headers || {};
-  }
-}
-globalThis.Response = globalThis.Response || NodeResponse;
-
+// ── AI provider ───────────────────────────────────────────────────────────────
 async function callAI(model, payload) {
   if (process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN) {
     const account = process.env.CLOUDFLARE_ACCOUNT_ID;
@@ -73,19 +61,50 @@ async function callAI(model, payload) {
   }
 
   if (process.env.ANTHROPIC_API_KEY) {
-    const [system, ...rest] = payload.messages || [];
+    const msgs = payload.messages || [];
+    const systemMsg = msgs.find(m => m.role === 'system');
+    const userMsgs = msgs.filter(m => m.role !== 'system');
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001', system: system?.content || undefined, messages: rest, max_tokens: payload.max_tokens || 4096 }),
+      headers: {
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001',
+        system: systemMsg?.content || undefined,
+        messages: userMsgs,
+        max_tokens: payload.max_tokens || 4096
+      }),
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data?.error?.message || `Anthropic HTTP ${r.status}`);
     return { choices: [{ message: { content: (data.content || []).map(x => x.text || '').join('\n') } }] };
   }
 
-  throw new Error('AI provider not configured. Set CLOUDFLARE_ACCOUNT_ID+CLOUDFLARE_API_TOKEN, OPENAI_API_KEY, or ANTHROPIC_API_KEY in Render environment variables.');
+  throw new Error('AI provider not configured. Set CLOUDFLARE_ACCOUNT_ID+CLOUDFLARE_API_TOKEN, OPENAI_API_KEY, or ANTHROPIC_API_KEY.');
 }
+
+// ── Request adapter (Cloudflare → Node) ──────────────────────────────────────
+function makeRequest(req) {
+  return {
+    json: async () => req.body,
+    text: async () => typeof req.body === 'string' ? req.body : JSON.stringify(req.body || {}),
+    method: req.method,
+    url: `${req.protocol}://${req.get('host')}${req.originalUrl}`,
+    headers: req.headers,
+  };
+}
+
+class NodeResponse {
+  constructor(body, init = {}) {
+    this.body = body;
+    this.status = init.status || 200;
+    this.headers = init.headers || {};
+  }
+}
+globalThis.Response = globalThis.Response || NodeResponse;
 
 const env = { AI: { run: callAI } };
 
@@ -112,7 +131,22 @@ async function adapt(handler, req, res) {
   }
 }
 
-app.get('/health', (req, res) => res.json({ ok: true, service: 'quick-assess-better-tools', aiProvider: process.env.CLOUDFLARE_ACCOUNT_ID && process.env.CLOUDFLARE_API_TOKEN ? 'cloudflare' : process.env.OPENAI_API_KEY ? 'openai' : process.env.ANTHROPIC_API_KEY ? 'anthropic' : 'not_configured' }));
+// ── Health ─────────────────────────────────────────────────────────────────────
+app.get('/health', (req, res) => {
+  const db = getPool();
+  res.json({
+    ok: true,
+    service: 'quick-assess-better-tools',
+    aiProvider: process.env.CLOUDFLARE_ACCOUNT_ID ? 'cloudflare'
+      : process.env.OPENAI_API_KEY ? 'openai'
+      : process.env.ANTHROPIC_API_KEY ? 'anthropic'
+      : 'not_configured',
+    db: db ? 'connected' : 'not_configured',
+    kb: getFullKB().length > 0 ? 'loaded' : 'not_loaded',
+  });
+});
+
+// ── AI tools (original 6, KB-enhanced) ────────────────────────────────────────
 app.post('/api/interpret', (req, res) => adapt(interpret, req, res));
 app.post('/api/ia-analysis', (req, res) => adapt(iaAnalysis, req, res));
 app.post('/api/diagnostic-analysis', (req, res) => adapt(diagnosticAnalysis, req, res));
@@ -120,7 +154,54 @@ app.post('/api/demo-analysis', (req, res) => adapt(demoAnalysis, req, res));
 app.post('/api/email-parse', (req, res) => adapt(emailParse, req, res));
 app.post('/api/action-extract', (req, res) => adapt(actionExtract, req, res));
 
+// ── Tool 7: KB Ask ─────────────────────────────────────────────────────────────
+app.post('/api/kb-ask', async (req, res) => {
+  // Inject KB text server-side so client doesn't have to send it
+  req.body.kbText = getFullKB();
+  adapt(kbAsk, req, res);
+});
+
+// ── KB context endpoint (for front-end to enrich prompts) ────────────────────
+app.post('/api/kb-context', (req, res) => {
+  const { text } = req.body || {};
+  const keywords = extractKeywords(text || '');
+  const context = getRelevantContext(keywords);
+  res.json({ context, keywords });
+});
+
+// ── Deal persistence ──────────────────────────────────────────────────────────
+app.all('/api/deals', (req, res) => dealsHandler(req, res, getPool()));
+app.all('/api/deals/:id', (req, res) => dealsHandler(req, res, getPool()));
+
+// ── Action items ──────────────────────────────────────────────────────────────
+app.all('/api/actions', (req, res) => actionsHandler(req, res, getPool()));
+app.all('/api/actions/:id', (req, res) => actionsHandler(req, res, getPool()));
+
+// ── Deal events log ───────────────────────────────────────────────────────────
+app.post('/api/deals/:id/events', async (req, res) => {
+  const db = getPool();
+  if (!db) return res.status(503).json({ error: 'No database' });
+  const { event_type, summary, payload } = req.body;
+  try {
+    const { rows } = await db.query(
+      `INSERT INTO deal_events (deal_id, event_type, summary, payload)
+       VALUES ($1,$2,$3,$4::jsonb) RETURNING *`,
+      [req.params.id, event_type, summary, JSON.stringify(payload || {})]
+    );
+    res.json(rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Static ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
-app.listen(PORT, () => console.log(`Quick Assess running on :${PORT}`));
+// ── Startup ────────────────────────────────────────────────────────────────────
+async function start() {
+  loadKB();
+  await initSchema();
+  app.listen(PORT, () => console.log(`Quick Assess running on :${PORT}`));
+}
+start();

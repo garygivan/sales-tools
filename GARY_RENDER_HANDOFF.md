@@ -1,6 +1,4 @@
-# Gary — Sales Tools Render/GitHub Handoff
-
-Duder recovered/wrapped the local Quick Assess source and pushed it to GitHub/Render.
+# Gary — Sales Tools Render/GitHub Handoff (v2)
 
 ## Live assets
 
@@ -8,6 +6,7 @@ Duder recovered/wrapped the local Quick Assess source and pushed it to GitHub/Re
 - Render service: https://dashboard.render.com/web/srv-db2kv9142hec738t6d30
 - Live URL: https://sales-tools-838w.onrender.com
 - Health check: https://sales-tools-838w.onrender.com/health
+- Render DB dashboard: https://dashboard.render.com/d/dpg-db2n06navr4c73dbvj2g-a
 
 ## Render settings
 
@@ -18,42 +17,51 @@ Duder recovered/wrapped the local Quick Assess source and pushed it to GitHub/Re
 - Start command: `npm start`
 - Health check path: `/health`
 - Auto-deploy: on commit to `main`
-- Database: not needed for this app
-- Persistent disk: not needed for this app
 
-## AI/API setup still needed
+## Environment variables (set in Render dashboard)
 
-The webpage is live now. The AI endpoints are wired, but Render needs one AI provider configured as environment variables.
+| Variable | Description |
+|---|---|
+| `ANTHROPIC_API_KEY` | Anthropic API key (set) |
+| `ANTHROPIC_MODEL` | claude-haiku-4-5-20251001 (set) |
+| `DATABASE_URL` | Render internal Postgres URL (set) |
+| `NODE_ENV` | production (set) |
 
-Pick one:
+## Architecture (v2)
 
-### Option A — Cloudflare Workers AI
+### AI Tools (7 total)
+1. `/api/interpret` — Note interpreter → Quick Assess form
+2. `/api/ia-analysis` — Initial Appointment transcript analysis
+3. `/api/diagnostic-analysis` — Discovery meeting analysis by HCM module
+4. `/api/demo-analysis` — Demo meeting reactions + open items
+5. `/api/email-parse` — Email thread → resolve/create action items (paste from Gmail/Outlook)
+6. `/api/action-extract` — Meeting transcript → action items
+7. `/api/kb-ask` — Ask the UKG Ready Knowledge Base (proprietary KB grounded answers)
 
-- `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_API_TOKEN`
-- Optional: `CLOUDFLARE_AI_MODEL=@cf/meta/llama-3.3-70b-instruct-fp8-fast`
+### Persistence (PostgreSQL)
+- `GET/POST /api/deals` — list / upsert deals
+- `GET/PUT/DELETE /api/deals/:id` — deal CRUD
+- `POST/PUT/DELETE /api/actions` — action item CRUD
+- `POST /api/deals/:id/events` — deal event log
 
-### Option B — OpenAI
-
-- `OPENAI_API_KEY`
-- Optional: `OPENAI_MODEL=gpt-4o-mini`
-
-### Option C — Anthropic
-
-- `ANTHROPIC_API_KEY`
-- Optional: `ANTHROPIC_MODEL=claude-haiku-4-5-20251001`
-
-Until one of those is set, the app loads but API calls return a clear provider-not-configured error.
+### KB enrichment
+- `POST /api/kb-context` — returns relevant KB sections for a given text block
+- KB file: `kb/ukg-ready-kb.md` (proprietary Mosaic/Evolve knowledge)
+- Loaded at server startup, injected into AI prompts and Tool 7
 
 ## Local development
 
 ```bash
 npm install
-npm test
+# Set env vars:
+export ANTHROPIC_API_KEY=...
+export DATABASE_URL=...  # external Render postgres URL for local dev
 npm start
 ```
 
 ## Notes
 
-- Do not commit `auth.txt`; it is intentionally gitignored.
-- The app does not require Postgres or a persistent disk unless future features need saved user data or file uploads.
+- `auth.txt` is gitignored — do not commit
+- DB is Render free tier (expires 90 days, free plan) — upgrade to starter ($7/mo) for always-on
+- Internal DB URL used in Render; external URL for local dev
+- KB file committed to repo (proprietary but needed by server at runtime)

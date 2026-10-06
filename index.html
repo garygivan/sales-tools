@@ -1324,7 +1324,7 @@
       <!-- Email input to close items -->
       <div class="ai-email-strip">
         <div class="ai-email-label">📧 Paste Email — Close Action Items</div>
-        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">AI will match email content against open items and mark resolved ones as closed.</div>
+        <div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px;">AI will match email content against open items and mark resolved ones as closed. Paste from Gmail, Outlook, or any email client — full threads work best.</div>
         <div class="ai-email-row">
           <textarea class="ia-textarea" id="ai-email-text" style="min-height:70px;" placeholder="Paste an email thread, reply, or forwarded message here…"></textarea>
           <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
@@ -1375,6 +1375,38 @@
       </div>
     </div>
     <div class="upload-status" id="upload-status" style="display:none;"></div>
+
+    <!-- ── Tool 7: Ask the UKG Ready KB ─────────────────────────────────── -->
+    <div class="stage-section" style="margin-bottom:16px;">
+      <div class="stage-header" style="background:#0f4c2a;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+        <div>
+          <div class="stage-toggle-label">🧠 Tool 7 — Ask the UKG Ready Knowledge Base</div>
+          <div class="stage-toggle-sub">Grounded answers from the Mosaic/Evolve proprietary KB — modules, config, competitive intel, implementation</div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;background:#f0fdf4;">
+        <div style="font-size:0.78rem;color:#166534;margin-bottom:10px;">Ask any question about UKG Ready — module capabilities, competitive comparisons, implementation requirements, multi-state payroll, cannabis config, and more. Answers come from the proprietary KB, not the open internet.</div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <textarea id="kb-question" style="flex:1;min-height:60px;font-size:0.82rem;font-family:inherit;padding:8px 10px;border:1px solid #86efac;border-radius:6px;resize:vertical;" placeholder="e.g. Does UKG Ready support daily overtime in California?&#10;How does carrier feed / EDI 834 work?&#10;What are the common implementation failure modes?"></textarea>
+          <button id="kb-ask-btn" onclick="runKbAsk()" style="padding:9px 16px;background:#15803d;color:#fff;border:none;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">🧠 Ask KB</button>
+        </div>
+        <div id="kb-status" style="font-size:0.75rem;margin-top:6px;min-height:16px;"></div>
+        <div id="kb-answer" style="display:none;margin-top:12px;padding:12px 14px;background:#fff;border:1px solid #86efac;border-radius:6px;font-size:0.82rem;line-height:1.55;white-space:pre-wrap;"></div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid #bbf7d0;">
+          <div style="font-size:0.72rem;color:#166534;font-weight:700;margin-bottom:6px;">QUICK QUESTIONS</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <button onclick="kbQuick('Does UKG Ready support daily overtime in California?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">CA daily OT</button>
+            <button onclick="kbQuick('What are the common implementation failure modes and how do we avoid them?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">Impl risks</button>
+            <button onclick="kbQuick('How does UKG Ready compare to Paycom?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">vs Paycom</button>
+            <button onclick="kbQuick('How does UKG Ready compare to Paylocity?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">vs Paylocity</button>
+            <button onclick="kbQuick('What cannabis-specific configurations are available in UKG Ready?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">Cannabis config</button>
+            <button onclick="kbQuick('How do carrier feeds and EDI 834 work in UKG Ready?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">Carrier feeds</button>
+            <button onclick="kbQuick('What does UKG Bryte AI do?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">UKG Bryte AI</button>
+            <button onclick="kbQuick('What integrations are available in the UKG Marketplace?')" style="font-size:0.72rem;padding:4px 10px;background:#dcfce7;border:1px solid #86efac;border-radius:4px;cursor:pointer;font-family:inherit;">Integrations</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="save-bar">
       <button class="save-btn sv" onclick="openSheetView()" style="background:#1e3a5f;color:#fff;">👁 Quick View</button>
@@ -3615,6 +3647,102 @@ function esc(str) {
 renderActions();
 restoreFromURL();
 updateAll();
+
+// ── Tool 7: KB Ask ────────────────────────────────────────────────────────────
+async function runKbAsk() {
+  const q = (document.getElementById('kb-question').value || '').trim();
+  if (!q) { alert('Please enter a question first.'); return; }
+  const btn = document.getElementById('kb-ask-btn');
+  const statusEl = document.getElementById('kb-status');
+  const answerEl = document.getElementById('kb-answer');
+  btn.disabled = true;
+  btn.textContent = '⏳ Thinking…';
+  statusEl.textContent = 'Searching knowledge base…';
+  statusEl.style.color = '#2563eb';
+  answerEl.style.display = 'none';
+  try {
+    const res = await fetch('/api/kb-ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question: q }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    answerEl.textContent = data.answer || '(No answer returned)';
+    answerEl.style.display = 'block';
+    statusEl.textContent = '✅ Answer from proprietary KB';
+    statusEl.style.color = '#15803d';
+  } catch (e) {
+    statusEl.textContent = '❌ ' + (e.message || 'Error');
+    statusEl.style.color = '#dc2626';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🧠 Ask KB';
+  }
+}
+
+function kbQuick(q) {
+  document.getElementById('kb-question').value = q;
+  runKbAsk();
+  document.getElementById('kb-question').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ── DB deal save/load (server-side, falls back to localStorage) ───────────────
+async function saveToServer(dealData) {
+  try {
+    const company = dealData.company || document.getElementById('dh-prospect')?.value?.trim();
+    if (!company) return null;
+    const res = await fetch('/api/deals', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        company,
+        bc: dealData.bc,
+        sdr: dealData.sdr,
+        sc: dealData.sc,
+        ees: dealData.ees,
+        arr: dealData.arr,
+        close_date: dealData.close_date,
+        website: dealData.website,
+        state: dealData,
+      }),
+    });
+    if (!res.ok) return null;
+    const saved = await res.json();
+    // Log the event
+    if (saved.id) {
+      fetch(`/api/deals/${saved.id}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event_type: 'save', summary: 'Deal saved from Quick Assess', payload: {} }),
+      }).catch(() => {});
+    }
+    return saved;
+  } catch { return null; }
+}
+
+// Patch saveDeal to also push to server
+const _origSaveDeal = typeof saveDeal === 'function' ? saveDeal : null;
+window.saveDeal = async function() {
+  if (_origSaveDeal) _origSaveDeal();
+  // Also save to server
+  const state = typeof getState === 'function' ? getState() : {};
+  const company = document.getElementById('dh-prospect')?.value?.trim();
+  if (company) {
+    saveToServer({
+      company,
+      bc: document.getElementById('dh-bc')?.value?.trim(),
+      sdr: document.getElementById('dh-sdr')?.value?.trim(),
+      sc: document.getElementById('dh-sc')?.value?.trim(),
+      ees: document.getElementById('dh-ees')?.value?.trim(),
+      arr: document.getElementById('dh-arr')?.value?.trim(),
+      close_date: document.getElementById('dh-close')?.value?.trim(),
+      website: document.getElementById('dh-website')?.value?.trim(),
+      ...state,
+    });
+  }
+};
+
 </script>
 </body>
 </html>
