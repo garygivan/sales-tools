@@ -77,7 +77,7 @@ async function callAI(model, payload) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: { 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: process.env.ANTHROPIC_MODEL || 'claude-3-5-haiku-latest', system: system?.content || undefined, messages: rest, max_tokens: payload.max_tokens || 4096 }),
+      body: JSON.stringify({ model: process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001', system: system?.content || undefined, messages: rest, max_tokens: payload.max_tokens || 4096 }),
     });
     const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data?.error?.message || `Anthropic HTTP ${r.status}`);

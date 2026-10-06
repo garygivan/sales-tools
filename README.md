@@ -28,7 +28,7 @@ Pick one AI provider:
 
 ### Anthropic
 - `ANTHROPIC_API_KEY`
-- Optional: `ANTHROPIC_MODEL=claude-3-5-haiku-latest`
+- Optional: `ANTHROPIC_MODEL=claude-haiku-4-5-20251001`
 
 Without one of those, the webpage will load, but the AI API endpoints return a provider-not-configured error.
 

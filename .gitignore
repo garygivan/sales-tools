@@ -4,3 +4,5 @@ node_modules/
 auth.txt
 *.log
 .DS_Store
+.anthropic-selected
+.cf-ai-selected.json

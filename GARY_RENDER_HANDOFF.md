@@ -41,7 +41,7 @@ Pick one:
 ### Option C — Anthropic
 
 - `ANTHROPIC_API_KEY`
-- Optional: `ANTHROPIC_MODEL=claude-3-5-haiku-latest`
+- Optional: `ANTHROPIC_MODEL=claude-haiku-4-5-20251001`
 
 Until one of those is set, the app loads but API calls return a clear provider-not-configured error.
 
