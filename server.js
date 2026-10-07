@@ -194,47 +194,39 @@ app.post('/api/deals/:id/events', async (req, res) => {
   }
 });
 
-// ── Matrix score editor API ───────────────────────────────────────────────────
+// ── Matrix editor API ─────────────────────────────────────────────────────────
 const MATRIX_FILE = path.join(__dirname, 'hcm-matrix.html');
 
-app.get('/api/matrix-scores', (req, res) => {
+// GET /api/matrix-data — returns the full QUESTIONS array from the live matrix
+app.get('/api/matrix-data', (req, res) => {
   try {
     const html = fs.readFileSync(MATRIX_FILE, 'utf8');
-    const match = html.match(/const SCORES = (\{[\s\S]*?\});\n\nconst LABELS/);
-    if (!match) return res.status(500).json({ error: 'Could not find SCORES block in matrix file' });
+    const match = html.match(/const QUESTIONS = (\[[\s\S]*?\]);\n\/\/ ── END QUESTIONS DATA/);
+    if (!match) return res.status(500).json({ error: 'QUESTIONS block not found in matrix file' });
     // eslint-disable-next-line no-new-func
-    const scores = new Function('return ' + match[1])();
-    res.json(scores);
+    const questions = new Function('return ' + match[1])();
+    res.json(questions);
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
+// POST /api/matrix-update — rewrites the QUESTIONS block in the live matrix
 app.post('/api/matrix-update', (req, res) => {
   try {
-    const { scores } = req.body;
-    if (!scores || typeof scores !== 'object') return res.status(400).json({ error: 'Missing scores object' });
+    const { questions } = req.body;
+    if (!Array.isArray(questions) || questions.length === 0)
+      return res.status(400).json({ error: 'Missing or empty questions array' });
 
-    // Format the new SCORES block
-    const lines = ['const SCORES = {'];
-    const qKeys = Object.keys(scores);
-    qKeys.forEach((qid, qi) => {
-      const aKeys = Object.keys(scores[qid]);
-      const pairs = aKeys.map(ak => {
-        const pts = scores[qid][ak];
-        return `    '${ak}': [${pts[0]},${pts[1]},${pts[2]}]`;
-      }).join(', ');
-      lines.push(`  ${qid}: { ${pairs.trim()} }${qi < qKeys.length - 1 ? ',' : ''}`);
-    });
-    lines.push('};');
-    const newBlock = lines.join('\n');
+    // Serialize the new QUESTIONS block as compact JSON
+    const newBlock = 'const QUESTIONS = ' + JSON.stringify(questions, null, 2) + ';\n// ── END QUESTIONS DATA';
 
     let html = fs.readFileSync(MATRIX_FILE, 'utf8');
     const replaced = html.replace(
-      /const SCORES = \{[\s\S]*?\};\n\nconst LABELS/,
-      newBlock + '\n\nconst LABELS'
+      /const QUESTIONS = \[[\s\S]*?\];\n\/\/ ── END QUESTIONS DATA/,
+      newBlock
     );
-    if (replaced === html) return res.status(500).json({ error: 'SCORES block not found — file may be malformed' });
+    if (replaced === html) return res.status(500).json({ error: 'QUESTIONS block not found — file may be malformed' });
 
     fs.writeFileSync(MATRIX_FILE, replaced, 'utf8');
     res.json({ ok: true, message: 'Matrix updated' });

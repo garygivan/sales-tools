@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HCM Matrix Editor — Score &amp; Question Editor</title>
+<title>HCM Matrix Editor</title>
 <style>
   :root {
     --peo: #E05206; --aso: #2563eb; --hcm: #7c3aed;
     --ink: #1a1a1a; --muted: #5a5a5b; --border: #e0d5cc;
     --surface: #faf8f6; --white: #ffffff; --charcoal: #3B3B3C;
-    --radius: 8px;
+    --radius: 8px; --danger: #dc2626;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', -apple-system, sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; }
@@ -17,71 +17,15 @@
   .header { background: var(--charcoal); color: #fff; padding: 22px 32px 18px; }
   .header h1 { font-size: 1.2rem; font-weight: 700; }
   .header p  { font-size: 0.85rem; opacity: 0.8; margin-top: 4px; }
-  .header .nav { margin-top: 12px; }
-  .header .nav a { color: #fff; opacity: 0.7; font-size: 0.8rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 4px; }
-  .header .nav a:hover { opacity: 1; }
+  .header a  { color: #fff; opacity: 0.7; font-size: 0.8rem; text-decoration: none; border: 1px solid rgba(255,255,255,0.3); padding: 4px 10px; border-radius: 4px; display: inline-block; margin-top: 12px; }
+  .header a:hover { opacity: 1; }
 
-  .main { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+  .main { max-width: 960px; margin: 0 auto; padding: 28px 20px 80px; }
 
-  .status-bar {
-    display: none; padding: 12px 16px; border-radius: var(--radius);
-    font-size: 0.9rem; font-weight: 600; margin-bottom: 20px;
-  }
+  .status-bar { display: none; padding: 12px 16px; border-radius: var(--radius); font-size: 0.9rem; font-weight: 600; margin-bottom: 20px; }
   .status-bar.success { display: block; background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
   .status-bar.error   { display: block; background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
   .status-bar.loading { display: block; background: #eff6ff; color: #1e40af; border: 1px solid #93c5fd; }
-
-  .q-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
-  .q-head  { background: #f1f5f9; padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; }
-  .q-num   { background: var(--charcoal); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 2px 7px; border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
-  .q-text  { font-size: 0.9rem; font-weight: 600; line-height: 1.4; }
-  .q-label-row { font-size: 0.75rem; color: var(--muted); font-style: italic; margin-top: 3px; }
-
-  .weight-table { width: 100%; border-collapse: collapse; }
-  .weight-table th, .weight-table td { padding: 9px 14px; text-align: left; border-bottom: 1px solid #f0eae4; }
-  .weight-table th { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); background: #fdf9f7; }
-  .weight-table tr:last-child td { border-bottom: none; }
-  .weight-table tr:hover td { background: #fdf6f2; }
-  .answer-label { font-size: 0.875rem; color: var(--ink); }
-
-  .th-peo { color: var(--peo) !important; }
-  .th-aso { color: var(--aso) !important; }
-  .th-hcm { color: var(--hcm) !important; }
-
-  .w-input {
-    width: 52px; padding: 5px 8px; border: 1px solid var(--border);
-    border-radius: 5px; font-size: 0.875rem; text-align: center;
-    transition: border-color 0.15s;
-  }
-  .w-input:focus { outline: none; border-color: #94a3b8; }
-  .w-input.peo:focus { border-color: var(--peo); }
-  .w-input.aso:focus { border-color: var(--aso); }
-  .w-input.hcm:focus { border-color: var(--hcm); }
-
-  .action-bar {
-    display: flex; gap: 12px; align-items: center;
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 16px 20px;
-    position: sticky; bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    margin-top: 8px;
-  }
-  .btn-update {
-    background: #16a34a; color: #fff; border: none; padding: 11px 28px;
-    border-radius: var(--radius); font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; transition: background 0.15s;
-  }
-  .btn-update:hover  { background: #15803d; }
-  .btn-update:active { background: #166534; }
-  .btn-update:disabled { background: #9ca3af; cursor: not-allowed; }
-
-  .btn-reset {
-    background: #fff; color: var(--muted); border: 1px solid var(--border);
-    padding: 11px 20px; border-radius: var(--radius); font-size: 0.875rem;
-    font-weight: 600; cursor: pointer; transition: border-color 0.15s;
-  }
-  .btn-reset:hover { border-color: #94a3b8; color: var(--ink); }
-
-  .hint { font-size: 0.8rem; color: var(--muted); }
 
   .legend { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; }
@@ -89,206 +33,285 @@
   .legend-dot.peo { background: var(--peo); }
   .legend-dot.aso { background: var(--aso); }
   .legend-dot.hcm { background: var(--hcm); }
+
+  /* Question block */
+  .q-block { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 20px; overflow: hidden; }
+
+  .q-head { background: #f1f5f9; padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 10px; }
+  .q-num-badge { background: var(--charcoal); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; margin-top: 3px; white-space: nowrap; }
+
+  .q-label-wrap { flex: 1; }
+  .q-label-note { font-size: 0.7rem; color: var(--muted); margin-bottom: 5px; font-style: italic; }
+  .q-label-input {
+    width: 100%; font-size: 0.92rem; font-weight: 600; font-family: inherit;
+    padding: 7px 10px; border: 1px solid var(--border); border-radius: 5px;
+    color: var(--ink); transition: border-color 0.15s;
+  }
+  .q-label-input:focus { outline: none; border-color: #94a3b8; }
+
+  .section-chip { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: #e2e8f0; color: #475569; flex-shrink: 0; margin-top: 4px; }
+
+  /* Answer rows */
+  .answers-wrap { padding: 0; }
+  .answer-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px 60px 36px;
+    gap: 8px;
+    align-items: center;
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0eae4;
+  }
+  .answer-row:last-of-type { border-bottom: none; }
+  .answer-row:hover { background: #fdf9f7; }
+
+  .answer-header {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px 60px 36px;
+    gap: 8px;
+    padding: 6px 14px;
+    background: #fdf9f7;
+    border-bottom: 1px solid var(--border);
+  }
+  .answer-header span { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  .answer-header span:first-child { text-align: left; }
+
+  .th-peo { color: var(--peo) !important; }
+  .th-aso { color: var(--aso) !important; }
+  .th-hcm { color: var(--hcm) !important; }
+
+  .a-text-input {
+    width: 100%; font-size: 0.85rem; font-family: inherit;
+    padding: 5px 8px; border: 1px solid var(--border);
+    border-radius: 5px; color: var(--ink); transition: border-color 0.15s;
+  }
+  .a-text-input:focus { outline: none; border-color: #94a3b8; }
+
+  .w-input {
+    width: 100%; padding: 5px 4px; border: 1px solid var(--border);
+    border-radius: 5px; font-size: 0.875rem; text-align: center;
+    transition: border-color 0.15s;
+  }
+  .w-input:focus { outline: none; }
+  .w-input.peo:focus { border-color: var(--peo); }
+  .w-input.aso:focus { border-color: var(--aso); }
+  .w-input.hcm:focus { border-color: var(--hcm); }
+
+  .del-answer-btn {
+    background: none; border: 1px solid #fca5a5; color: #ef4444;
+    border-radius: 4px; width: 28px; height: 28px; cursor: pointer;
+    font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+    transition: background 0.12s;
+  }
+  .del-answer-btn:hover { background: #fee2e2; }
+
+  .add-answer-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: 1px dashed #94a3b8; color: var(--muted);
+    border-radius: 5px; padding: 7px 14px; cursor: pointer;
+    font-size: 0.82rem; font-family: inherit; font-weight: 600;
+    margin: 8px 14px 10px; transition: border-color 0.15s, color 0.15s;
+  }
+  .add-answer-btn:hover { border-color: var(--charcoal); color: var(--charcoal); }
+
+  /* Action bar */
+  .action-bar {
+    display: flex; gap: 12px; align-items: center;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 20px;
+    position: sticky; bottom: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    margin-top: 8px;
+  }
+  .btn-update {
+    background: #16a34a; color: #fff; border: none; padding: 11px 28px;
+    border-radius: var(--radius); font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: background 0.15s; font-family: inherit;
+  }
+  .btn-update:hover { background: #15803d; }
+  .btn-update:disabled { background: #9ca3af; cursor: not-allowed; }
+  .btn-reset {
+    background: #fff; color: var(--muted); border: 1px solid var(--border);
+    padding: 11px 20px; border-radius: var(--radius); font-size: 0.875rem;
+    font-weight: 600; cursor: pointer; font-family: inherit; transition: border-color 0.15s;
+  }
+  .btn-reset:hover { border-color: #94a3b8; color: var(--ink); }
+  .hint { font-size: 0.8rem; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <h1>⚙️ HCM Matrix Score Editor</h1>
-  <p>Edit question weights, then click Update to apply changes to the live Decision Matrix.</p>
-  <div class="nav"><a href="/matrix">← Back to Decision Matrix</a></div>
+  <h1>⚙️ HCM Matrix Editor</h1>
+  <p>Edit question text, answer options, and point weights — then click Update to apply changes live.</p>
+  <a href="/matrix">← Back to Decision Matrix</a>
 </div>
 
 <div class="main">
-  <div class="status-bar loading" id="status">Loading current scores…</div>
+  <div class="status-bar loading" id="status">Loading current questions…</div>
 
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot peo"></div>PEO — Professional Employer Org.</div>
-    <div class="legend-item"><div class="legend-dot aso"></div>ASO — Admin Services Outsourcing</div>
-    <div class="legend-item"><div class="legend-dot hcm"></div>Enterprise HCM — Human Capital Mgmt</div>
+    <div class="legend-item"><div class="legend-dot peo"></div>PEO points</div>
+    <div class="legend-item"><div class="legend-dot aso"></div>ASO points</div>
+    <div class="legend-item"><div class="legend-dot hcm"></div>HCM points</div>
   </div>
 
-  <div id="editor-body"><!-- questions rendered here --></div>
+  <div id="editor-body"></div>
 
   <div class="action-bar">
     <button class="btn-update" id="btn-update" onclick="pushUpdate()" disabled>🔄 Update Decision Matrix</button>
-    <button class="btn-reset" onclick="reloadScores()">↺ Reload Current Scores</button>
-    <span class="hint">Changes apply instantly — no page reload needed.</span>
+    <button class="btn-reset" onclick="reloadData()">↺ Reload</button>
+    <span class="hint">Changes apply instantly to the live matrix — no deploy needed.</span>
   </div>
 </div>
 
 <script>
-// ── Question definitions (labels + answer options) ─────────────────────────────
-const QUESTIONS = [
-  { id:'q1', label:'How many employees does the prospect have?',
-    answers: [
-      {key:'1-49',    text:'1 – 49'},
-      {key:'50-74',   text:'50 – 74'},
-      {key:'75-150',  text:'75 – 150'},
-      {key:'151-200', text:'151 – 200'},
-      {key:'201+',    text:'201+'}
-    ]},
-  { id:'q2', label:'Is the company growing rapidly (expecting 50%+ headcount growth in 12 months)?',
-    answers: [
-      {key:'rapid',    text:'Yes — rapid growth expected'},
-      {key:'moderate', text:'Moderate growth'},
-      {key:'stable',   text:'Stable / no significant growth'}
-    ]},
-  { id:'q3', label:'Who is the primary buyer / decision maker?',
-    answers: [
-      {key:'owner',  text:'Owner or CEO (small business)'},
-      {key:'cfo',    text:'CFO / Finance leader'},
-      {key:'hr-dir', text:'HR Director or VP'},
-      {key:'hr-mgr', text:'HR Manager or Generalist'},
-      {key:'other',  text:'Other / Committee'}
-    ]},
-  { id:'q4', label:"What is the prospect's primary stated pain point?",
-    answers: [
-      {key:'expertise', text:'We need HR expertise / strategic guidance'},
-      {key:'admin',     text:'We need admin support — HR is overwhelmed'},
-      {key:'software',  text:'Our current software is painful to use'},
-      {key:'benefits',  text:'We need better benefits / insurance options'},
-      {key:'other',     text:'Other / not clearly stated'}
-    ]},
-  { id:'q5', label:'How does the prospect describe their ideal solution?',
-    answers: [
-      {key:'partner',  text:'A true partner who handles HR for us'},
-      {key:'support',  text:'Admin support — but we stay in control'},
-      {key:'software', text:'Great software our team can use themselves'},
-      {key:'unsure',   text:'Not sure / open to options'}
-    ]},
-  { id:'q6', label:'Is the prospect interested in outsourced employee benefits / group health insurance?',
-    answers: [
-      {key:'top',        text:'Yes — this is a top priority'},
-      {key:'interested', text:'Interested but not the top driver'},
-      {key:'no',         text:'No — they manage benefits independently'},
-      {key:'unsure',     text:'Unsure / not discussed'}
-    ]},
-  { id:'q7', label:"Is the prospect interested in outsourced workers' comp insurance?",
-    answers: [
-      {key:'major', text:'Yes — major interest'},
-      {key:'some',  text:'Some interest'},
-      {key:'no',    text:'No / not relevant'}
-    ]},
-  { id:'q8', label:'Does the prospect currently have dedicated HR staff?',
-    answers: [
-      {key:'none',  text:'No dedicated HR — owner/office mgr handles it'},
-      {key:'one',   text:'1 HR person (generalist / coordinator)'},
-      {key:'small', text:'Small HR team (2–4 people)'},
-      {key:'large', text:'Established HR team (5+ people)'}
-    ]},
-  { id:'q9', label:'How important is the technology platform / user experience to the buyer?',
-    answers: [
-      {key:'critical',  text:'Critical — they are evaluating UX closely'},
-      {key:'important', text:'Important but not the deciding factor'},
-      {key:'moderate',  text:'Moderate — they just need it to work'},
-      {key:'low',       text:'Low — technology is not a focus'}
-    ]},
-  { id:'q10', label:'Has the prospect had a bad experience with HCM software support in the past?',
-    answers: [
-      {key:'yes',      text:'Yes — poor support is a key concern'},
-      {key:'mixed',    text:'Mixed experience'},
-      {key:'no-hcm',   text:'No prior HCM / unsure'},
-      {key:'positive', text:'Positive experience'}
-    ]},
-  { id:'q11', label:'Is the prospect currently evaluating pure HCM platforms (e.g. ADP, Paycom, Paylocity)?',
-    answers: [
-      {key:'yes',      text:'Yes — actively comparing HCM vendors'},
-      {key:'possibly', text:'Possibly — mentioned a few names'},
-      {key:'no',       text:'No — not on their radar'}
-    ]},
-  { id:'q12', label:"What is the prospect's appetite for co-managed HR / outsourcing?",
-    answers: [
-      {key:'high',     text:'High — wants to offload HR entirely'},
-      {key:'moderate', text:'Moderate — wants support but stays involved'},
-      {key:'low',      text:'Low — wants to stay in control / self-serve'}
-    ]}
-];
+let questions = [];
 
-let currentScores = {};
-
-async function reloadScores() {
-  setStatus('loading', 'Loading current scores…');
+async function reloadData() {
+  setStatus('loading', 'Loading…');
   document.getElementById('btn-update').disabled = true;
   try {
-    const res = await fetch('/api/matrix-scores');
+    const res = await fetch('/api/matrix-data');
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    currentScores = await res.json();
-    renderEditor(currentScores);
-    setStatus('success', '✓ Current scores loaded.');
+    questions = await res.json();
+    renderEditor();
+    setStatus('success', '✓ Loaded. Make your edits, then click Update Decision Matrix.');
     document.getElementById('btn-update').disabled = false;
   } catch(e) {
-    setStatus('error', '✗ Failed to load scores: ' + e.message);
+    setStatus('error', '✗ Failed to load: ' + e.message);
   }
 }
 
-function renderEditor(scores) {
+function renderEditor() {
   const body = document.getElementById('editor-body');
   body.innerHTML = '';
-  QUESTIONS.forEach((q, idx) => {
+  questions.forEach((q, qi) => {
     const block = document.createElement('div');
     block.className = 'q-block';
-    const qScores = scores[q.id] || {};
-    let rows = '';
-    q.answers.forEach(a => {
-      const pts = qScores[a.key] || [0,0,0];
-      rows += `<tr>
-        <td class="answer-label">${a.text}</td>
-        <td><input type="number" class="w-input peo" min="0" max="9" value="${pts[0]}" data-q="${q.id}" data-a="${a.key}" data-i="0"></td>
-        <td><input type="number" class="w-input aso" min="0" max="9" value="${pts[1]}" data-q="${q.id}" data-a="${a.key}" data-i="1"></td>
-        <td><input type="number" class="w-input hcm" min="0" max="9" value="${pts[2]}" data-q="${q.id}" data-a="${a.key}" data-i="2"></td>
-      </tr>`;
-    });
-    block.innerHTML = `
-      <div class="q-head">
-        <span class="q-num">${idx + 1}</span>
-        <div>
-          <div class="q-text">${q.label}</div>
-        </div>
+    block.dataset.qi = qi;
+
+    // Header: question number + section chip + editable label
+    const head = document.createElement('div');
+    head.className = 'q-head';
+    head.innerHTML = `
+      <span class="q-num-badge">Q${qi + 1}</span>
+      <div class="q-label-wrap">
+        <div class="q-label-note">Question text (shown to sellers)</div>
+        <input type="text" class="q-label-input" value="${escHtml(q.label)}" data-qi="${qi}" placeholder="Question text…">
       </div>
-      <table class="weight-table">
-        <thead>
-          <tr>
-            <th style="width:55%">Answer Option</th>
-            <th class="th-peo">PEO</th>
-            <th class="th-aso">ASO</th>
-            <th class="th-hcm">HCM</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>`;
+      <span class="section-chip">${escHtml(q.section)}</span>`;
+    block.appendChild(head);
+
+    // Column headers
+    const hdr = document.createElement('div');
+    hdr.className = 'answer-header';
+    hdr.innerHTML = `
+      <span>Answer Option Text</span>
+      <span class="th-peo">PEO</span>
+      <span class="th-aso">ASO</span>
+      <span class="th-hcm">HCM</span>
+      <span></span>`;
+    block.appendChild(hdr);
+
+    // Answer rows
+    const answersWrap = document.createElement('div');
+    answersWrap.className = 'answers-wrap';
+    answersWrap.dataset.qi = qi;
+    q.answers.forEach((a, ai) => {
+      answersWrap.appendChild(buildAnswerRow(qi, ai, a));
+    });
+    block.appendChild(answersWrap);
+
+    // Add answer button
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-answer-btn';
+    addBtn.innerHTML = '+ Add Answer Option';
+    addBtn.onclick = () => addAnswer(qi);
+    block.appendChild(addBtn);
+
     body.appendChild(block);
   });
 }
 
-function collectScores() {
-  const scores = {};
-  document.querySelectorAll('.w-input').forEach(inp => {
-    const q = inp.dataset.q;
-    const a = inp.dataset.a;
-    const i = parseInt(inp.dataset.i);
-    if (!scores[q]) scores[q] = {};
-    if (!scores[q][a]) scores[q][a] = [0, 0, 0];
-    scores[q][a][i] = parseInt(inp.value) || 0;
+function buildAnswerRow(qi, ai, a) {
+  const row = document.createElement('div');
+  row.className = 'answer-row';
+  row.dataset.qi = qi;
+  row.dataset.ai = ai;
+  row.innerHTML = `
+    <input type="text" class="a-text-input" value="${escHtml(a.text)}" placeholder="Answer text…" data-qi="${qi}" data-ai="${ai}" data-field="text">
+    <input type="number" class="w-input peo" min="0" max="9" value="${a.pts[0]}" data-qi="${qi}" data-ai="${ai}" data-i="0">
+    <input type="number" class="w-input aso" min="0" max="9" value="${a.pts[1]}" data-qi="${qi}" data-ai="${ai}" data-i="1">
+    <input type="number" class="w-input hcm" min="0" max="9" value="${a.pts[2]}" data-qi="${qi}" data-ai="${ai}" data-i="2">
+    <button class="del-answer-btn" onclick="removeAnswer(${qi},${ai})" title="Remove this answer">✕</button>`;
+  return row;
+}
+
+function addAnswer(qi) {
+  questions[qi].answers.push({ key: 'new-' + Date.now(), text: '', pts: [0, 0, 0] });
+  rerenderAnswers(qi);
+}
+
+function removeAnswer(qi, ai) {
+  if (questions[qi].answers.length <= 1) {
+    alert('A question must have at least one answer option.');
+    return;
+  }
+  questions[qi].answers.splice(ai, 1);
+  rerenderAnswers(qi);
+}
+
+function rerenderAnswers(qi) {
+  // Collect current state of all other questions first
+  collectState();
+  // Re-render just the answers section for this question
+  const blocks = document.querySelectorAll('.q-block');
+  const block = blocks[qi];
+  const oldWrap = block.querySelector('.answers-wrap');
+  const newWrap = document.createElement('div');
+  newWrap.className = 'answers-wrap';
+  newWrap.dataset.qi = qi;
+  questions[qi].answers.forEach((a, ai) => {
+    newWrap.appendChild(buildAnswerRow(qi, ai, a));
   });
-  return scores;
+  block.replaceChild(newWrap, oldWrap);
+}
+
+function collectState() {
+  // Collect question labels
+  document.querySelectorAll('.q-label-input').forEach(inp => {
+    const qi = parseInt(inp.dataset.qi);
+    if (questions[qi]) questions[qi].label = inp.value;
+  });
+  // Collect answer texts and weights
+  document.querySelectorAll('.answer-row').forEach(row => {
+    const qi = parseInt(row.dataset.qi);
+    const ai = parseInt(row.dataset.ai);
+    if (!questions[qi] || !questions[qi].answers[ai]) return;
+    const textInp = row.querySelector('.a-text-input');
+    if (textInp) questions[qi].answers[ai].text = textInp.value;
+    row.querySelectorAll('.w-input').forEach(inp => {
+      const i = parseInt(inp.dataset.i);
+      questions[qi].answers[ai].pts[i] = parseInt(inp.value) || 0;
+    });
+  });
 }
 
 async function pushUpdate() {
+  collectState();
   const btn = document.getElementById('btn-update');
   btn.disabled = true;
   btn.textContent = '⏳ Updating…';
-  setStatus('loading', 'Applying changes to the Decision Matrix…');
+  setStatus('loading', 'Applying changes to the live Decision Matrix…');
   try {
-    const scores = collectScores();
     const res = await fetch('/api/matrix-update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ scores })
+      body: JSON.stringify({ questions })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'HTTP ' + res.status);
-    setStatus('success', '✅ Decision Matrix updated successfully! Changes are live at /matrix.');
+    setStatus('success', '✅ Decision Matrix updated! Changes are live at /matrix.');
   } catch(e) {
     setStatus('error', '✗ Update failed: ' + e.message);
   } finally {
@@ -303,8 +326,15 @@ function setStatus(type, msg) {
   el.textContent = msg;
 }
 
-// Load on page open
-reloadScores();
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+reloadData();
 </script>
 </body>
 </html>
