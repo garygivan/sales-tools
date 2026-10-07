@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCM Decision Matrix — Prospect Discovery Tool</title>
+<style>
+  :root {
+    --teal:       #E05206;
+    --teal-dark:  #b84004;
+    --teal-light: #fdf0e8;
+    --teal-mid:   #f5c9a8;
+    --ink:        #1a1a1a;
+    --muted:      #5a5a5b;
+    --border:     #e0d5cc;
+    --surface:    #faf8f6;
+    --white:      #ffffff;
+    --charcoal:   #3B3B3C;
+    --peo:        #E05206;
+    --aso:        #2563eb;
+    --hcm:        #7c3aed;
+    --warn:       #d97706;
+    --danger:     #dc2626;
+    --radius:     8px;
+    --shadow:     0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--charcoal);
+    color: var(--white);
+    padding: 24px 32px 20px;
+  }
+  .header h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .header p {
+    font-size: 0.875rem;
+    opacity: 0.85;
+    margin-top: 4px;
+  }
+
+  /* ── Layout ── */
+  .main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+
+  /* ── Section label ── */
+  .section-label {
+    background: var(--teal);
+    color: var(--white);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin-top: 24px;
+  }
+
+  /* ── Question card ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 0;
+    margin-bottom: 0;
+  }
+  .card:last-of-type { border-radius: 0 0 var(--radius) var(--radius); }
+
+  .q-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  .q-row:last-child { border-bottom: none; }
+  .q-row:hover { background: var(--teal-light); }
+
+  .q-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--teal);
+    text-align: center;
+    background: var(--teal-light);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    line-height: 24px;
+    flex-shrink: 0;
+  }
+
+  .q-text {
+    font-size: 0.875rem;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  select {
+    font-size: 0.82rem;
+    padding: 7px 30px 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--white);
+    color: var(--muted);
+    cursor: pointer;
+    min-width: 260px;
+    max-width: 320px;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230D7A6E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  select:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(13,122,110,0.15);
+    color: var(--ink);
+  }
+  select.answered { color: var(--ink); border-color: var(--teal-mid); background-color: var(--teal-light); }
+
+  /* ── Results panel ── */
+  .results-wrap {
+    margin-top: 28px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .results-header {
+    background: var(--charcoal);
+    color: var(--white);
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .results-header h2 { font-size: 0.85rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .reset-btn {
+    background: rgba(255,255,255,0.18);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .reset-btn:hover { background: rgba(255,255,255,0.28); }
+  .reset-btn:active { background: rgba(255,255,255,0.1); }
+
+  /* ── Recommendation ── */
+  .recommendation {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .rec-placeholder {
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-style: italic;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .rec-result { display: none; }
+  .rec-result.visible { display: block; }
+
+  .rec-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .rec-name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .rec-name.peo  { color: var(--peo); }
+  .rec-name.aso  { color: var(--aso); }
+  .rec-name.hcm  { color: var(--hcm); }
+
+  /* ── Score bars ── */
+  .score-bars { display: flex; flex-direction: column; gap: 7px; margin: 4px 0 12px; }
+  .score-row { display: grid; grid-template-columns: 90px 1fr 36px; gap: 8px; align-items: center; font-size: 0.8rem; }
+  .score-row-label { font-weight: 600; color: var(--muted); text-align: right; }
+  .bar-track { height: 10px; background: #eef0f0; border-radius: 99px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); width: 0%; }
+  .bar-fill.peo { background: var(--peo); }
+  .bar-fill.aso { background: var(--aso); }
+  .bar-fill.hcm { background: var(--hcm); }
+  .score-val { font-weight: 700; font-size: 0.8rem; color: var(--ink); }
+
+  .confidence-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+  .confidence-badge.strong { background: #dcfce7; color: #166534; }
+  .confidence-badge.tight  { background: #fef9c3; color: #854d0e; }
+
+  /* ── Selections summary ── */
+  .selections-section {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .selections-section h3 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .sel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 20px;
+  }
+  @media (max-width: 560px) { .sel-grid { grid-template-columns: 1fr; } }
+  .sel-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 0.78rem;
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .sel-item:last-child { border-bottom: none; }
+  .sel-key { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .sel-val { color: var(--ink); text-align: right; font-style: italic; }
+  .sel-val.empty { color: #bbb; font-style: italic; }
+
+  /* ── Notes ── */
+  .notes-section { padding: 16px 20px; }
+  .notes-section label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 8px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    color: var(--ink);
+    resize: vertical;
+    transition: border-color 0.15s;
+  }
+  textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,122,110,0.12); }
+  textarea::placeholder { color: #bbb; }
+
+  /* ── Footer note ── */
+  .footer-note {
+    margin-top: 24px;
+    padding: 10px 16px;
+    background: var(--teal-light);
+    border-left: 3px solid var(--teal);
+    border-radius: 4px;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  /* ── Reference Matrix ── */
+  .matrix-wrap {
+    margin-bottom: 32px;
+  }
+  .matrix-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 18px;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--teal);
+    transition: background 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .matrix-toggle:hover { background: var(--teal-light); }
+  .matrix-toggle .toggle-icon {
+    font-size: 1rem;
+    transition: transform 0.2s;
+    display: inline-block;
+    margin-left: auto;
+  }
+  .matrix-toggle.open .toggle-icon { transform: rotate(180deg); }
+
+  .matrix-panel {
+    display: none;
+    margin-top: 8px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .matrix-panel.open { display: block; }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr 1fr;
+  }
+
+  .matrix-col-header {
+    padding: 12px 14px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--white);
+    border-right: 1px solid rgba(255,255,255,0.2);
+  }
+  .matrix-col-header:last-child { border-right: none; }
+  .matrix-col-header.label-col { background: #2d2d2e; }
+  .matrix-col-header.peo-col   { background: var(--peo); }
+  .matrix-col-header.aso-col   { background: var(--aso); }
+  .matrix-col-header.hcm-col   { background: var(--hcm); }
+
+  .matrix-row-label {
+    padding: 16px 14px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    border-top: 1px solid rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+  }
+  .matrix-row-label.peo-bg { background: #b84004; }
+  .matrix-row-label.aso-bg { background: #1e40af; }
+  .matrix-row-label.hcm-bg { background: #5b21b6; }
+
+  .matrix-cell {
+    padding: 14px 14px;
+    font-size: 0.78rem;
+    color: var(--ink);
+    border-top: 1px solid var(--border);
+    border-left: 1px solid var(--border);
+    vertical-align: top;
+    line-height: 1.55;
+  }
+  .matrix-cell ul {
+    padding-left: 14px;
+    margin: 0;
+  }
+  .matrix-cell ul li { margin-bottom: 3px; }
+  .matrix-cell .range-badge {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .matrix-cell .range-badge.peo { color: var(--peo); }
+  .matrix-cell .range-badge.aso { color: var(--aso); }
+  .matrix-cell .range-badge.hcm { color: var(--hcm); }
+  .matrix-cell .overlap-note {
+    font-size: 0.7rem;
+    color: var(--warn);
+    font-style: italic;
+    margin-top: 4px;
+  }
+  .matrix-cell .risk-note {
+    font-size: 0.7rem;
+    color: var(--danger);
+    font-weight: 600;
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: #fff5f5;
+    border-left: 2px solid var(--danger);
+    border-radius: 2px;
+  }
+  .payroll-note {
+    padding: 9px 16px;
+    background: var(--teal-light);
+    border-top: 1px solid var(--teal-mid);
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ── Prospect name bar ── */
+  .prospect-bar {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .prospect-bar label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    white-space: nowrap;
+  }
+  .prospect-bar input {
+    flex: 1;
+    font-size: 0.9rem;
+    font-family: inherit;
+    padding: 7px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--ink);
+    transition: border-color 0.15s;
+  }
+  .prospect-bar input:focus {
+    outline: none;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 3px rgba(224,82,6,0.12);
+  }
+  .prospect-bar input::placeholder { color: #bbb; }
+
+  /* ── Save buttons ── */
+  .save-bar {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .save-btn {
+    flex: 1;
+    padding: 9px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .save-btn:active { transform: scale(0.97); opacity: 0.85; }
+  .save-btn.copy-btn {
+    background: var(--charcoal);
+    color: var(--white);
+  }
+  .save-btn.copy-btn:hover { opacity: 0.88; }
+  .save-btn.print-btn {
+    background: var(--teal);
+    color: var(--white);
+  }
+  .save-btn.print-btn:hover { opacity: 0.88; }
+  .save-btn.link-btn {
+    background: #2563eb;
+    color: var(--white);
+  }
+  .save-btn.link-btn:hover { opacity: 0.88; }
+  .copy-confirm {
+    font-size: 0.78rem;
+    color: #166534;
+    font-weight: 600;
+    align-self: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .copy-confirm.show { opacity: 1; }
+
+  /* ── My Deals ── */
+  .md-overlay {
+    display: none; position: fixed; inset: 0; z-index: 1200;
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(3px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .md-overlay.open { display: flex; }
+  .md-modal {
+    background: #fff; border-radius: 10px; width: 100%; max-width: 560px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.22); overflow: hidden;
+    max-height: 80vh; display: flex; flex-direction: column;
+    animation: md-in 0.18s ease;
+  }
+  @keyframes md-in { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:none; } }
+  .md-head {
+    background: #3B3B3C; color: #fff; padding: 14px 18px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  }
+  .md-close {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: #fff; border-radius: 6px; padding: 4px 10px; font-size: 0.82rem;
+    font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s;
+  }
+  .md-close:hover { background: rgba(255,255,255,0.28); }
+  .md-list-scroll { overflow-y: auto; flex: 1; }
+  .md-deal-row {
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 10px; padding: 12px 20px; border-bottom: 1px solid #f0f0f0;
+    align-items: center; transition: background 0.12s;
+  }
+  .md-deal-row:hover { background: #faf8f6; }
+  .md-deal-name { font-size: 0.88rem; font-weight: 700; color: #1a1a1a; }
+  .md-deal-meta { font-size: 0.72rem; color: #5a5a5b; margin-top: 2px; }
+  .md-deal-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .md-open-btn {
+    padding: 5px 12px; background: #E05206; color: #fff;
+    border: none; border-radius: 5px; font-size: 0.75rem; font-weight: 700;
+    cursor: pointer; font-family: inherit; transition: opacity 0.15s;
+  }
+  .md-open-btn:hover { opacity: 0.88; }
+  .md-del-btn {
+    padding: 5px 8px; background: #f3f4f6; color: #9ca3af;
+    border: none; border-radius: 5px; font-size: 0.75rem;
+    cursor: pointer; font-family: inherit; transition: color 0.15s, background 0.15s;
+  }
+  .md-del-btn:hover { color: #dc2626; background: #fee2e2; }
+  .md-empty { padding: 24px 20px; font-size: 0.85rem; color: #bbb; font-style: italic; text-align: center; }
+  .md-rec-chip {
+    display: inline-block; font-size: 0.65rem; font-weight: 700; padding: 1px 7px;
+    border-radius: 99px; margin-left: 6px; vertical-align: middle;
+  }
+  .md-peo { background: #fde8d8; color: #b84004; }
+  .md-aso { background: #dbeafe; color: #1e3a8a; }
+  .md-hcm { background: #ede9fe; color: #5b21b6; }
+  .md-none { background: #f3f4f6; color: #6b7280; }
+
+  /* ── Print / export ── */
+  @media print {
+    body { background: white; }
+    .reset-btn, .save-bar, .prospect-bar input { display: none; }
+    .prospect-name-print { display: block !important; }
+    select { border: none; appearance: none; background-image: none; padding-left: 0; }
+    .header { background: var(--teal) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;">
+    <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="38" height="38" rx="6" fill="#E05206"/>
+      <text x="19" y="26" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="white" text-anchor="middle">V</text>
+    </svg>
+    <div>
+      <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;opacity:0.65;margin-bottom:1px;">VensureHR</div>
+      <h1>HCM Decision Matrix — Prospect Discovery Tool</h1>
+    </div>
+  </div>
+  <p>Complete the questions using the dropdowns. The scoring model will recommend the best-fit service offering.</p>
+</div>
+
+<div class="main">
+
+  <!-- ── REFERENCE MATRIX ─────────────────────────── -->
+  <div class="matrix-wrap">
+    <button class="matrix-toggle" onclick="toggleMatrix(this)" aria-expanded="false">
+      📊 Decision Matrix Reference — click to expand
+      <span class="toggle-icon">▼</span>
+    </button>
+    <div class="matrix-panel" id="matrix-panel">
+      <div class="matrix-grid">
+        <!-- Header row -->
+        <div class="matrix-col-header label-col">Decision Dimension</div>
+        <div class="matrix-col-header peo-col">PEO<br><span style="font-weight:400;font-size:0.7rem;opacity:0.85">Professional Employer Org.</span></div>
+        <div class="matrix-col-header aso-col">ASO<br><span style="font-weight:400;font-size:0.7rem;opacity:0.85">Admin Services Outsourcing</span></div>
+        <div class="matrix-col-header hcm-col">Enterprise HCM<br><span style="font-weight:400;font-size:0.7rem;opacity:0.85">Human Capital Management</span></div>
+
+        <!-- Row 1: Employer Size -->
+        <div class="matrix-row-label peo-bg">Employer Size Range</div>
+        <div class="matrix-cell">
+          <div class="range-badge peo">1 – 150</div><br>
+          Typical small-to-mid market
+          <div class="overlap-note">⚠ Overlaps ASO at 50–150</div>
+        </div>
+        <div class="matrix-cell">
+          <div class="range-badge aso">50 – 200</div><br>
+          Mid-market; employer of record retained
+          <div class="overlap-note">⚠ Overlaps PEO at 50–150 and HCM at 75–200</div>
+        </div>
+        <div class="matrix-cell">
+          <div class="range-badge hcm">75 – 5,000+</div><br>
+          Mid-market to enterprise; robust HR capacity
+          <div class="overlap-note">⚠ Overlaps ASO at 75–200</div>
+        </div>
+
+        <!-- Row 2: Buyer Modality -->
+        <div class="matrix-row-label aso-bg">Buyer Modality</div>
+        <div class="matrix-cell">
+          <ul>
+            <li>Owner / CFO / HR leader buying for the business</li>
+            <li>Values partnership, guidance &amp; risk transfer</li>
+            <li>Technology is secondary — service is the sale</li>
+          </ul>
+        </div>
+        <div class="matrix-cell">
+          <ul>
+            <li>HR leader seeking admin leverage</li>
+            <li>Values operational support &amp; compliance depth</li>
+            <li>Technology supporting, not the deciding factor</li>
+          </ul>
+          <div class="risk-note">⚠ Seller risk: prospects here almost always also evaluating pure HCM. Qualify admin vs. platform preference carefully.</div>
+        </div>
+        <div class="matrix-cell">
+          <ul>
+            <li>User buyers: HR Generalist → Director → VP</li>
+            <li>Platform UX &amp; post-go-live experience drive the decision</li>
+            <li>Ongoing support model is a critical differentiator</li>
+          </ul>
+          <div class="risk-note">⚠ Seller risk: don't overvalue your admin support if the prospect is really buying a platform.</div>
+        </div>
+
+        <!-- Row 3: Service & Platform Attributes -->
+        <div class="matrix-row-label hcm-bg">Service &amp; Platform Attributes</div>
+        <div class="matrix-cell">
+          <ul>
+            <li>Strategic HR partnership</li>
+            <li>HR admin &amp; compliance support</li>
+            <li>Group purchasing: health benefits, workers comp &amp; insurance</li>
+            <li>Full payroll services <em>(embedded)</em></li>
+          </ul>
+        </div>
+        <div class="matrix-cell">
+          <ul>
+            <li>HR admin &amp; compliance support</li>
+            <li>No benefits or insurance products</li>
+            <li>Client retains employer of record</li>
+            <li>Full payroll services <em>(embedded)</em></li>
+          </ul>
+        </div>
+        <div class="matrix-cell">
+          <ul>
+            <li>HR technology platform — core focus</li>
+            <li>Post-implementation user experience is primary value</li>
+            <li>Ongoing support model is a critical differentiator</li>
+            <li>Full payroll services <em>(embedded)</em></li>
+          </ul>
+        </div>
+      </div>
+      <div class="payroll-note">
+        Payroll services (processing · tax filing · ACH/direct deposit) are embedded in <strong>all three</strong> offerings.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EMPLOYER SIZE ──────────────────────────────── -->
+  <div class="prospect-bar">
+    <label for="prospect-name">Company Name</label>
+    <input type="text" id="prospect-name" placeholder="e.g. Acme Corp" autocomplete="off">
+    <div class="prospect-name-print" style="display:none;font-weight:700;font-size:0.9rem;" id="prospect-name-print"></div>
+  </div>
+  <div class="section-label">Employer Size</div>
+  <div class="card">
+    <div class="q-row">
+      <span class="q-num">1</span>
+      <span class="q-text">How many employees does the prospect have?</span>
+      <select id="q1" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="1-49">1 – 49</option>
+        <option value="50-74">50 – 74</option>
+        <option value="75-150">75 – 150</option>
+        <option value="151-200">151 – 200</option>
+        <option value="201+">201+</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">2</span>
+      <span class="q-text">Is the company growing rapidly (expecting 50%+ headcount growth in 12 months)?</span>
+      <select id="q2" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="rapid">Yes — rapid growth expected</option>
+        <option value="moderate">Moderate growth</option>
+        <option value="stable">Stable / no significant growth</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── BUYER MODALITY ─────────────────────────────── -->
+  <div class="section-label">Buyer Modality</div>
+  <div class="card">
+    <div class="q-row">
+      <span class="q-num">3</span>
+      <span class="q-text">Who is the primary buyer / decision maker?</span>
+      <select id="q3" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="owner">Owner or CEO (small business)</option>
+        <option value="cfo">CFO / Finance leader</option>
+        <option value="hr-dir">HR Director or VP</option>
+        <option value="hr-mgr">HR Manager or Generalist</option>
+        <option value="other">Other / Committee</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">4</span>
+      <span class="q-text">What is the prospect's primary stated pain point?</span>
+      <select id="q4" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="expertise">We need HR expertise / strategic guidance</option>
+        <option value="admin">We need admin support — HR is overwhelmed</option>
+        <option value="software">Our current software is painful to use</option>
+        <option value="benefits">We need better benefits / insurance options</option>
+        <option value="other">Other / not clearly stated</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">5</span>
+      <span class="q-text">How does the prospect describe their ideal solution?</span>
+      <select id="q5" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="partner">A true partner who handles HR for us</option>
+        <option value="support">Admin support — but we stay in control</option>
+        <option value="software">Great software our team can use themselves</option>
+        <option value="unsure">Not sure / open to options</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── SERVICE & PLATFORM ATTRIBUTES ─────────────── -->
+  <div class="section-label">Service &amp; Platform Attributes</div>
+  <div class="card">
+    <div class="q-row">
+      <span class="q-num">6</span>
+      <span class="q-text">Is the prospect interested in outsourced employee benefits / group health insurance?</span>
+      <select id="q6" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="top">Yes — this is a top priority</option>
+        <option value="interested">Interested but not the top driver</option>
+        <option value="no">No — they manage benefits independently</option>
+        <option value="unsure">Unsure / not discussed</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">7</span>
+      <span class="q-text">Is the prospect interested in outsourced workers' comp insurance?</span>
+      <select id="q7" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="major">Yes — major interest</option>
+        <option value="some">Some interest</option>
+        <option value="no">No / not relevant</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">8</span>
+      <span class="q-text">Does the prospect currently have dedicated HR staff?</span>
+      <select id="q8" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="none">No dedicated HR — owner/office mgr handles it</option>
+        <option value="one">1 HR person (generalist / coordinator)</option>
+        <option value="small">Small HR team (2–4 people)</option>
+        <option value="large">Established HR team (5+ people)</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">9</span>
+      <span class="q-text">How important is the technology platform / user experience to the buyer?</span>
+      <select id="q9" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="critical">Critical — they are evaluating UX closely</option>
+        <option value="important">Important but not the deciding factor</option>
+        <option value="moderate">Moderate — they just need it to work</option>
+        <option value="low">Low — technology is not a focus</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">10</span>
+      <span class="q-text">Has the prospect had a bad experience with HCM software support in the past?</span>
+      <select id="q10" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="yes">Yes — poor support is a key concern</option>
+        <option value="mixed">Mixed experience</option>
+        <option value="no-hcm">No prior HCM / unsure</option>
+        <option value="positive">Positive experience</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">11</span>
+      <span class="q-text">Is the prospect currently evaluating pure HCM platforms (e.g. ADP, Paycom, Paylocity)?</span>
+      <select id="q11" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="yes">Yes — actively comparing HCM vendors</option>
+        <option value="possibly">Possibly — mentioned a few names</option>
+        <option value="no">No — not on their radar</option>
+      </select>
+    </div>
+    <div class="q-row">
+      <span class="q-num">12</span>
+      <span class="q-text">What is the prospect's appetite for co-managed HR / outsourcing?</span>
+      <select id="q12" onchange="score()">
+        <option value="">← Select an answer</option>
+        <option value="high">High — wants to offload HR entirely</option>
+        <option value="moderate">Moderate — wants support but stays involved</option>
+        <option value="low">Low — wants to stay in control / self-serve</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── RESULTS PANEL ──────────────────────────────── -->
+  <div class="results-wrap">
+    <div class="results-header">
+      <h2>Recommendation</h2>
+      <button class="reset-btn" onclick="resetForm()">↺ Reset Form</button>
+    </div>
+
+    <div class="recommendation">
+      <div class="rec-placeholder" id="rec-placeholder">← Answer the questions above to generate a recommendation</div>
+      <div class="rec-result" id="rec-result">
+        <div class="rec-label">Best-fit service offering</div>
+        <div class="rec-name" id="rec-name"></div>
+        <div class="score-bars">
+          <div class="score-row">
+            <span class="score-row-label">PEO</span>
+            <div class="bar-track"><div class="bar-fill peo" id="bar-peo"></div></div>
+            <span class="score-val" id="val-peo">0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-row-label">ASO</span>
+            <div class="bar-track"><div class="bar-fill aso" id="bar-aso"></div></div>
+            <span class="score-val" id="val-aso">0</span>
+          </div>
+          <div class="score-row">
+            <span class="score-row-label">Enterprise HCM</span>
+            <div class="bar-track"><div class="bar-fill hcm" id="bar-hcm"></div></div>
+            <span class="score-val" id="val-hcm">0</span>
+          </div>
+        </div>
+        <span class="confidence-badge" id="confidence-badge"></span>
+      </div>
+    </div>
+
+    <!-- Your Selections -->
+    <div class="selections-section">
+      <h3>Your Selections</h3>
+      <div class="sel-grid" id="sel-grid"></div>
+    </div>
+
+    <!-- Seller Notes -->
+    <div class="notes-section">
+      <label for="notes">Seller Notes</label>
+      <textarea id="notes" placeholder="Type qualifying notes here..."></textarea>
+    </div>
+
+    <!-- Save bar -->
+    <div class="save-bar">
+      <button class="save-btn copy-btn" onclick="copySummary()">📋 Copy Summary</button>
+      <button class="save-btn print-btn" onclick="savePDF()">🖨 Save as PDF</button>
+      <button class="save-btn link-btn" onclick="copyLink()">🔗 Copy Link</button>
+      <button class="save-btn" onclick="saveDeal()" style="background:#7c3aed;color:#fff;flex:1;">💾 Save Deal</button>
+      <button class="save-btn" onclick="openMyDeals()" style="background:#374151;color:#fff;flex:1;">📁 My Deals</button>
+      <span class="copy-confirm" id="copy-confirm"></span>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Payroll services (processing · tax filing · ACH/direct deposit) are embedded in <strong>all three</strong> offerings.
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── MY DEALS MODAL ────────────────────────────────────────────────────── -->
+<div class="md-overlay" id="md-overlay" onclick="if(event.target===this)closeMyDeals()">
+  <div class="md-modal">
+    <div class="md-head">
+      <div>
+        <div style="font-size:0.85rem;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;">📁 My Prospects</div>
+        <div style="font-size:0.75rem;opacity:0.7;margin-top:3px;">Saved in this browser — click Open to reload</div>
+      </div>
+      <button class="md-close" onclick="closeMyDeals()">✕</button>
+    </div>
+    <div id="md-list" class="md-list-scroll"></div>
+    <div style="padding:12px 20px;border-top:1px solid #e0d5cc;display:flex;justify-content:flex-end;">
+      <button onclick="closeMyDeals()" style="padding:7px 18px;background:#f3f4f6;color:#374151;border:none;border-radius:6px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MAX_SCORE = 36;
+
+// ── Scoring tables ────────────────────────────────────────────────────────────
+const SCORES = {
+  q1: {
+    '1-49':   [3,0,0], '50-74': [3,2,0], '75-150': [2,3,1],
+    '151-200':[0,3,2], '201+':  [0,1,3]
+  },
+  q2: {
+    'rapid':   [2,1,2], 'moderate': [1,1,1], 'stable': [0,0,1]
+  },
+  q3: {
+    'owner':  [3,2,0], 'cfo': [2,2,1], 'hr-dir': [1,2,2],
+    'hr-mgr': [0,1,3], 'other': [0,0,2]
+  },
+  q4: {
+    'expertise': [3,1,0], 'admin': [2,3,0], 'software': [0,0,3],
+    'benefits': [3,0,0], 'other': [1,1,2]
+  },
+  q5: {
+    'partner': [3,1,0], 'support': [1,3,1], 'software': [0,0,3], 'unsure': [1,1,1]
+  },
+  q6: {
+    'top': [3,0,0], 'interested': [2,0,0], 'no': [0,2,2], 'unsure': [1,1,1]
+  },
+  q7: {
+    'major': [3,0,0], 'some': [1,0,0], 'no': [0,1,1]
+  },
+  q8: {
+    'none': [3,1,0], 'one': [2,2,0], 'small': [1,2,1], 'large': [0,1,3]
+  },
+  q9: {
+    'critical': [0,0,3], 'important': [0,1,2], 'moderate': [1,2,1], 'low': [3,2,0]
+  },
+  q10: {
+    'yes': [1,1,2], 'mixed': [0,0,1], 'no-hcm': [1,1,1], 'positive': [0,0,0]
+  },
+  q11: {
+    'yes': [0,1,3], 'possibly': [0,1,2], 'no': [2,1,0]
+  },
+  q12: {
+    'high': [3,1,0], 'moderate': [1,2,1], 'low': [0,1,3]
+  }
+};
+
+const LABELS = {
+  q1:  'How many employees does the prospect have?',
+  q2:  'Is the company growing rapidly (expecting 50%+ headcount growth in 12 months)?',
+  q3:  'Who is the primary buyer / decision maker?',
+  q4:  "What is the prospect's primary stated pain point?",
+  q5:  'How does the prospect describe their ideal solution?',
+  q6:  'Is the prospect interested in outsourced employee benefits / group health insurance?',
+  q7:  "Is the prospect interested in outsourced workers' comp insurance?",
+  q8:  'Does the prospect currently have dedicated HR staff?',
+  q9:  'How important is the technology platform / user experience to the buyer?',
+  q10: 'Has the prospect had a bad experience with HCM software support in the past?',
+  q11: 'Is the prospect currently evaluating pure HCM platforms (e.g. ADP, Paycom, Paylocity)?',
+  q12: "What is the prospect's appetite for co-managed HR / outsourcing?"
+};
+
+const REC_NAMES = {
+  peo: 'PEO — Professional Employer Organization',
+  aso: 'ASO — Administrative Services Outsourcing',
+  hcm: 'Enterprise HCM — Human Capital Management'
+};
+
+function getVal(id) {
+  return document.getElementById(id).value;
+}
+
+function score() {
+  let peo = 0, aso = 0, hcm = 0, answered = 0;
+
+  for (const [qid, table] of Object.entries(SCORES)) {
+    const v = getVal(qid);
+    const el = document.getElementById(qid);
+    if (v) {
+      const pts = table[v] || [0,0,0];
+      peo += pts[0]; aso += pts[1]; hcm += pts[2];
+      answered++;
+      el.classList.add('answered');
+    } else {
+      el.classList.remove('answered');
+    }
+  }
+
+  updateSelections();
+
+  if (answered === 0) {
+    document.getElementById('rec-placeholder').style.display = '';
+    document.getElementById('rec-result').classList.remove('visible');
+    return;
+  }
+
+  document.getElementById('rec-placeholder').style.display = 'none';
+  document.getElementById('rec-result').classList.add('visible');
+
+  // Scores
+  document.getElementById('val-peo').textContent = peo;
+  document.getElementById('val-aso').textContent = aso;
+  document.getElementById('val-hcm').textContent = hcm;
+
+  const maxPts = Math.max(peo, aso, hcm, 1);
+  document.getElementById('bar-peo').style.width = (peo / MAX_SCORE * 100) + '%';
+  document.getElementById('bar-aso').style.width = (aso / MAX_SCORE * 100) + '%';
+  document.getElementById('bar-hcm').style.width = (hcm / MAX_SCORE * 100) + '%';
+
+  // Winner
+  let winner = 'peo';
+  if (aso > peo && aso >= hcm) winner = 'aso';
+  else if (hcm > peo && hcm > aso) winner = 'hcm';
+
+  const recName = document.getElementById('rec-name');
+  recName.textContent = REC_NAMES[winner];
+  recName.className = 'rec-name ' + winner;
+
+  // Confidence
+  const sorted = [peo, aso, hcm].sort((a,b) => b-a);
+  const gap = sorted[0] - sorted[1];
+  const badge = document.getElementById('confidence-badge');
+  if (gap <= 2) {
+    badge.textContent = '⚠ Tight race — review overlap zone carefully';
+    badge.className = 'confidence-badge tight';
+  } else {
+    badge.textContent = '✓ Strong signal — high confidence';
+    badge.className = 'confidence-badge strong';
+  }
+}
+
+function updateSelections() {
+  const grid = document.getElementById('sel-grid');
+  grid.innerHTML = '';
+  for (const [qid, label] of Object.entries(LABELS)) {
+    const sel = document.getElementById(qid);
+    const val = sel.value
+      ? sel.options[sel.selectedIndex].text
+      : null;
+    const item = document.createElement('div');
+    item.className = 'sel-item';
+    item.innerHTML = `
+      <span class="sel-key">${label}</span>
+      <span class="sel-val ${val ? '' : 'empty'}">${val || '(not answered)'}</span>
+    `;
+    grid.appendChild(item);
+  }
+}
+
+function resetForm() {
+  for (const qid of Object.keys(SCORES)) {
+    const el = document.getElementById(qid);
+    el.value = '';
+    el.classList.remove('answered');
+  }
+  document.getElementById('notes').value = '';
+  document.getElementById('rec-placeholder').style.display = '';
+  document.getElementById('rec-result').classList.remove('visible');
+  document.getElementById('val-peo').textContent = '0';
+  document.getElementById('val-aso').textContent = '0';
+  document.getElementById('val-hcm').textContent = '0';
+  document.getElementById('bar-peo').style.width = '0%';
+  document.getElementById('bar-aso').style.width = '0%';
+  document.getElementById('bar-hcm').style.width = '0%';
+  updateSelections();
+}
+
+// Init selections display on load
+updateSelections();
+restoreFromHash();
+
+function toggleMatrix(btn) {
+  const panel = document.getElementById('matrix-panel');
+  const open = panel.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.setAttribute('aria-expanded', open);
+}
+
+function showConfirm(msg) {
+  const confirm = document.getElementById('copy-confirm');
+  confirm.textContent = msg;
+  confirm.classList.add('show');
+  setTimeout(() => confirm.classList.remove('show'), 2500);
+}
+
+function copyLink() {
+  const state = {};
+  for (const qid of Object.keys(SCORES)) {
+    const v = document.getElementById(qid).value;
+    if (v) state[qid] = v;
+  }
+  const notes = document.getElementById('notes').value.trim();
+  if (notes) state['nt'] = notes;
+
+  const prospect = document.getElementById('prospect-name').value.trim();
+  const base = location.href.split('?')[0].split('#')[0];
+  const coParam = prospect ? '?co=' + encodeURIComponent(prospect) : '';
+  const hash = '#' + encodeURIComponent(JSON.stringify(state));
+  const url = base + coParam + hash;
+
+  navigator.clipboard.writeText(url).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+  }).finally(() => showConfirm('🔗 Link copied!'));
+}
+
+function restoreFromHash() {
+  // Restore company name from ?co= query param
+  const params = new URLSearchParams(location.search);
+  const co = params.get('co');
+  if (co) document.getElementById('prospect-name').value = co;
+
+  // Restore answers from hash
+  const hash = location.hash.slice(1);
+  if (!hash) return;
+  try {
+    const state = JSON.parse(decodeURIComponent(hash));
+    for (const [key, val] of Object.entries(state)) {
+      if (key === 'nt') {
+        document.getElementById('notes').value = val;
+      } else {
+        const el = document.getElementById(key);
+        if (el) el.value = val;
+      }
+    }
+    score();
+  } catch(e) { /* malformed hash — ignore */ }
+}
+
+function savePDF() {
+  const name = document.getElementById('prospect-name').value.trim();
+  const printEl = document.getElementById('prospect-name-print');
+  printEl.textContent = name ? 'Prospect: ' + name : '';
+  window.print();
+}
+
+function copySummary() {
+  const prospect = document.getElementById('prospect-name').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+  const recResult = document.getElementById('rec-result');
+  const isVisible = recResult.classList.contains('visible');
+
+  const lines = [];
+
+  lines.push('HCM Decision Matrix — Prospect Discovery Tool');
+  lines.push('VensureHR');
+  if (prospect) lines.push('Prospect: ' + prospect);
+  lines.push('Date: ' + new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}));
+  lines.push('');
+
+  if (isVisible) {
+    const recName = document.getElementById('rec-name').textContent;
+    const peo = document.getElementById('val-peo').textContent;
+    const aso = document.getElementById('val-aso').textContent;
+    const hcm = document.getElementById('val-hcm').textContent;
+    const badge = document.getElementById('confidence-badge').textContent;
+
+    lines.push('RECOMMENDATION: ' + recName);
+    lines.push('Confidence: ' + badge);
+    lines.push('');
+    lines.push('SCORES');
+    lines.push('  PEO:            ' + peo + ' / 36');
+    lines.push('  ASO:            ' + aso + ' / 36');
+    lines.push('  Enterprise HCM: ' + hcm + ' / 36');
+    lines.push('');
+  } else {
+    lines.push('(No recommendation — questions not yet answered)');
+    lines.push('');
+  }
+
+  lines.push('SELECTIONS');
+  for (const [qid, label] of Object.entries(LABELS)) {
+    const sel = document.getElementById(qid);
+    const val = sel.value ? sel.options[sel.selectedIndex].text : '(not answered)';
+    lines.push('  ' + label + ': ' + val);
+  }
+
+  if (notes) {
+    lines.push('');
+    lines.push('SELLER NOTES');
+    lines.push(notes);
+  }
+
+  const text = lines.join('\n');
+
+  navigator.clipboard.writeText(text).then(() => {
+    showConfirm('📋 Copied!');
+  }).catch(() => {
+    // Fallback for older browsers
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showConfirm('📋 Copied!');
+  });
+}
+// ── My Deals ─────────────────────────────────────────────────────────────────
+const DM_DEALS_KEY = 'dm_my_prospects';
+
+function dmLoadDeals() {
+  try { return JSON.parse(localStorage.getItem(DM_DEALS_KEY) || '[]'); } catch { return []; }
+}
+function dmSaveDeals(deals) { localStorage.setItem(DM_DEALS_KEY, JSON.stringify(deals)); }
+
+function saveDeal() {
+  const prospect = document.getElementById('prospect-name').value.trim();
+  if (!prospect) { showConfirm('⚠ Enter a company name first'); return; }
+
+  // Build URL — same logic as copyLink
+  const state = {};
+  for (const qid of Object.keys(SCORES)) {
+    const v = document.getElementById(qid).value;
+    if (v) state[qid] = v;
+  }
+  const notesVal = document.getElementById('notes').value.trim();
+  if (notesVal) state['nt'] = notesVal;
+  const base    = location.href.split('?')[0].split('#')[0];
+  const coParam = '?co=' + encodeURIComponent(prospect);
+  const hash    = '#' + encodeURIComponent(JSON.stringify(state));
+  const url     = base + coParam + hash;
+
+  // Get current recommendation
+  const recResult = document.getElementById('rec-result');
+  const isVisible = recResult.classList.contains('visible');
+  const recName   = isVisible ? document.getElementById('rec-name').textContent : null;
+  const winner    = isVisible ? (recName.toLowerCase().startsWith('peo') ? 'peo' : recName.toLowerCase().startsWith('aso') ? 'aso' : 'hcm') : 'none';
+
+  const deals = dmLoadDeals();
+  const existingIdx = deals.findIndex(d => d.prospect.toLowerCase() === prospect.toLowerCase());
+  const entry = {
+    id:       existingIdx >= 0 ? deals[existingIdx].id : Date.now(),
+    prospect,
+    winner,
+    recName:  recName || 'Not scored yet',
+    saved:    new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'}),
+    url,
+  };
+  if (existingIdx >= 0) deals[existingIdx] = entry;
+  else deals.unshift(entry);
+  dmSaveDeals(deals);
+  showConfirm('💾 Saved!');
+}
+
+function openMyDeals() {
+  renderMyDeals();
+  document.getElementById('md-overlay').classList.add('open');
+}
+function closeMyDeals() { document.getElementById('md-overlay').classList.remove('open'); }
+
+function deleteDeal(id) {
+  dmSaveDeals(dmLoadDeals().filter(d => d.id !== id));
+  renderMyDeals();
+}
+
+function openDeal(url) { closeMyDeals(); location.href = url; }
+
+function renderMyDeals() {
+  const deals = dmLoadDeals();
+  const list  = document.getElementById('md-list');
+  if (deals.length === 0) {
+    list.innerHTML = '<div class="md-empty">No prospects saved yet — score a prospect and click 💾 Save Deal.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  deals.forEach(d => {
+    const chipCls = 'md-rec-chip md-' + d.winner;
+    const row = document.createElement('div');
+    row.className = 'md-deal-row';
+    row.innerHTML = `
+      <div>
+        <div class="md-deal-name">
+          ${d.prospect}
+          <span class="${chipCls}">${d.winner === 'none' ? 'Not scored' : d.winner.toUpperCase()}</span>
+        </div>
+        <div class="md-deal-meta">${d.recName} · Saved ${d.saved}</div>
+      </div>
+      <div class="md-deal-actions">
+        <button class="md-open-btn" onclick="openDeal('${d.url.replace(/'/g,"\\'")}')">Open</button>
+        <button class="md-del-btn" onclick="deleteDeal(${d.id})" title="Remove">✕</button>
+      </div>`;
+    list.appendChild(row);
+  });
+}
+</script>
+</body>
+</html>

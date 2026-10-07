@@ -196,6 +196,7 @@ app.post('/api/deals/:id/events', async (req, res) => {
 
 // ── Static ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/matrix', (req, res) => res.sendFile(path.join(__dirname, 'hcm-matrix.html')));
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // ── Startup ────────────────────────────────────────────────────────────────────
