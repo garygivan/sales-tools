@@ -194,9 +194,59 @@ app.post('/api/deals/:id/events', async (req, res) => {
   }
 });
 
+// ── Matrix score editor API ───────────────────────────────────────────────────
+const MATRIX_FILE = path.join(__dirname, 'hcm-matrix.html');
+
+app.get('/api/matrix-scores', (req, res) => {
+  try {
+    const html = fs.readFileSync(MATRIX_FILE, 'utf8');
+    const match = html.match(/const SCORES = (\{[\s\S]*?\});\n\nconst LABELS/);
+    if (!match) return res.status(500).json({ error: 'Could not find SCORES block in matrix file' });
+    // eslint-disable-next-line no-new-func
+    const scores = new Function('return ' + match[1])();
+    res.json(scores);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.post('/api/matrix-update', (req, res) => {
+  try {
+    const { scores } = req.body;
+    if (!scores || typeof scores !== 'object') return res.status(400).json({ error: 'Missing scores object' });
+
+    // Format the new SCORES block
+    const lines = ['const SCORES = {'];
+    const qKeys = Object.keys(scores);
+    qKeys.forEach((qid, qi) => {
+      const aKeys = Object.keys(scores[qid]);
+      const pairs = aKeys.map(ak => {
+        const pts = scores[qid][ak];
+        return `    '${ak}': [${pts[0]},${pts[1]},${pts[2]}]`;
+      }).join(', ');
+      lines.push(`  ${qid}: { ${pairs.trim()} }${qi < qKeys.length - 1 ? ',' : ''}`);
+    });
+    lines.push('};');
+    const newBlock = lines.join('\n');
+
+    let html = fs.readFileSync(MATRIX_FILE, 'utf8');
+    const replaced = html.replace(
+      /const SCORES = \{[\s\S]*?\};\n\nconst LABELS/,
+      newBlock + '\n\nconst LABELS'
+    );
+    if (replaced === html) return res.status(500).json({ error: 'SCORES block not found — file may be malformed' });
+
+    fs.writeFileSync(MATRIX_FILE, replaced, 'utf8');
+    res.json({ ok: true, message: 'Matrix updated' });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── Static ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/matrix', (req, res) => res.sendFile(path.join(__dirname, 'hcm-matrix.html')));
+app.get('/matrix-editor', (req, res) => res.sendFile(path.join(__dirname, 'hcm-editor.html')));
 app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // ── Startup ────────────────────────────────────────────────────────────────────
