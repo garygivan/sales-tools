@@ -233,42 +233,17 @@
 
   /* ── Selections summary ── */
   .selections-section {
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
   }
-  .selections-toggle {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 12px 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    text-align: left;
-    gap: 8px;
-    transition: background 0.15s;
-  }
-  .selections-toggle:hover { background: var(--teal-light); }
-  .selections-toggle h3 {
+  .selections-section h3 {
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
-    margin: 0;
-    flex: 1;
+    margin-bottom: 10px;
   }
-  .selections-toggle .sel-toggle-icon {
-    font-size: 0.85rem;
-    color: var(--muted);
-    transition: transform 0.2s;
-    display: inline-block;
-  }
-  .selections-toggle.open .sel-toggle-icon { transform: rotate(180deg); }
-  .sel-body {
-    display: none;
-    padding: 4px 20px 16px;
-  }
-  .sel-body.open { display: block; }
   .sel-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -742,13 +717,8 @@
     </div>
 
     <div class="selections-section">
-      <button class="selections-toggle" id="sel-toggle" onclick="toggleSelections()" aria-expanded="false">
-        <h3>Your Selections</h3>
-        <span class="sel-toggle-icon">▼</span>
-      </button>
-      <div class="sel-body" id="sel-body">
-        <div class="sel-grid" id="sel-grid"></div>
-      </div>
+      <h3>Your Selections</h3>
+      <div class="sel-grid" id="sel-grid"></div>
     </div>
 
     <div class="notes-section">
@@ -1002,14 +972,6 @@ function resetForm() {
 renderQuestions();
 updateSelections();
 restoreFromHash();
-
-function toggleSelections() {
-  const toggle = document.getElementById('sel-toggle');
-  const body   = document.getElementById('sel-body');
-  const open   = body.classList.toggle('open');
-  toggle.classList.toggle('open', open);
-  toggle.setAttribute('aria-expanded', open);
-}
 
 function toggleMatrix(btn) {
   const panel = document.getElementById('matrix-panel');
