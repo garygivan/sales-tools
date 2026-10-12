@@ -233,17 +233,42 @@
 
   /* ── Selections summary ── */
   .selections-section {
-    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
   }
-  .selections-section h3 {
+  .selections-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    gap: 8px;
+    transition: background 0.15s;
+  }
+  .selections-toggle:hover { background: var(--teal-light); }
+  .selections-toggle h3 {
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 10px;
+    margin: 0;
+    flex: 1;
   }
+  .sel-toggle-icon {
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .selections-toggle.open .sel-toggle-icon { transform: rotate(180deg); }
+  .sel-body {
+    display: none;
+    padding: 4px 20px 16px;
+  }
+  .sel-body.open { display: block; }
   .sel-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -717,8 +742,13 @@
     </div>
 
     <div class="selections-section">
-      <h3>Your Selections</h3>
-      <div class="sel-grid" id="sel-grid"></div>
+      <button class="selections-toggle" id="sel-toggle" onclick="toggleSelections()" aria-expanded="false">
+        <h3>Your Selections</h3>
+        <span class="sel-toggle-icon">▼</span>
+      </button>
+      <div class="sel-body" id="sel-body">
+        <div class="sel-grid" id="sel-grid"></div>
+      </div>
     </div>
 
     <div class="notes-section">
@@ -985,6 +1015,14 @@ function resetForm() {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadQuestions();
+
+function toggleSelections() {
+  const toggle = document.getElementById('sel-toggle');
+  const body   = document.getElementById('sel-body');
+  const open   = body.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', open);
+}
 
 function toggleMatrix(btn) {
   const panel = document.getElementById('matrix-panel');
