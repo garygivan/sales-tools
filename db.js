@@ -72,6 +72,12 @@ export async function initSchema() {
         created_at  TIMESTAMPTZ DEFAULT NOW()
       );
 
+      CREATE TABLE IF NOT EXISTS matrix_questions (
+        id          SERIAL PRIMARY KEY,
+        questions   JSONB NOT NULL,
+        updated_at  TIMESTAMPTZ DEFAULT NOW()
+      );
+
       CREATE INDEX IF NOT EXISTS idx_deals_company ON deals(company);
       CREATE INDEX IF NOT EXISTS idx_actions_deal ON deal_actions(deal_id);
       CREATE INDEX IF NOT EXISTS idx_events_deal ON deal_events(deal_id);

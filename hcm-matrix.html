@@ -759,8 +759,23 @@
 </div>
 
 <script>
-// ── QUESTIONS DATA ────────────────────────────────────────────────────────────
-const QUESTIONS = [
+// ── QUESTIONS DATA — loaded from DB via API ───────────────────────────────────
+let QUESTIONS = [];
+
+async function loadQuestions() {
+  try {
+    const res = await fetch('/api/matrix-data');
+    QUESTIONS = await res.json();
+  } catch(e) {
+    console.error('Failed to load questions from API:', e);
+  }
+  renderQuestions();
+  updateSelections();
+  restoreFromHash();
+}
+
+// placeholder so old QUESTIONS block pattern is still present for fallback
+const QUESTIONS_PLACEHOLDER = [
   { "section": "Employer Size", "id": "q1", "label": "How many employees does the prospect have?", "answers": [
     { "key": "1-49",    "text": "1 \u2013 49",    "pts": [3,0,0] },
     { "key": "50-74",   "text": "50 \u2013 74",   "pts": [3,2,0] },
@@ -969,9 +984,7 @@ function resetForm() {
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-renderQuestions();
-updateSelections();
-restoreFromHash();
+loadQuestions();
 
 function toggleMatrix(btn) {
   const panel = document.getElementById('matrix-panel');

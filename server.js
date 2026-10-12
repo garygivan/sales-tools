@@ -194,42 +194,40 @@ app.post('/api/deals/:id/events', async (req, res) => {
   }
 });
 
-// ── Matrix editor API ─────────────────────────────────────────────────────────
-const MATRIX_FILE = path.join(__dirname, 'hcm-matrix.html');
+// ── Matrix editor API (DB-backed — survives redeploys) ───────────────────────
 
-// GET /api/matrix-data — returns the full QUESTIONS array from the live matrix
-app.get('/api/matrix-data', (req, res) => {
+// GET /api/matrix-data — returns questions from DB (falls back to HTML embed)
+app.get('/api/matrix-data', async (req, res) => {
   try {
-    const html = fs.readFileSync(MATRIX_FILE, 'utf8');
+    const db = getPool();
+    if (db) {
+      const { rows } = await db.query('SELECT questions FROM matrix_questions ORDER BY id DESC LIMIT 1');
+      if (rows.length > 0) return res.json(rows[0].questions);
+    }
+    // Fallback: parse from HTML file (first boot before seed)
+    const html = fs.readFileSync(path.join(__dirname, 'hcm-matrix.html'), 'utf8');
     const match = html.match(/const QUESTIONS = (\[[\s\S]*?\]);\n\/\/ ── END QUESTIONS DATA/);
-    if (!match) return res.status(500).json({ error: 'QUESTIONS block not found in matrix file' });
+    if (!match) return res.status(500).json({ error: 'QUESTIONS block not found' });
     // eslint-disable-next-line no-new-func
-    const questions = new Function('return ' + match[1])();
-    res.json(questions);
+    res.json(new Function('return ' + match[1])());
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// POST /api/matrix-update — rewrites the QUESTIONS block in the live matrix
-app.post('/api/matrix-update', (req, res) => {
+// POST /api/matrix-update — saves questions to DB (no file writes)
+app.post('/api/matrix-update', async (req, res) => {
   try {
     const { questions } = req.body;
     if (!Array.isArray(questions) || questions.length === 0)
       return res.status(400).json({ error: 'Missing or empty questions array' });
-
-    // Serialize the new QUESTIONS block as compact JSON
-    const newBlock = 'const QUESTIONS = ' + JSON.stringify(questions, null, 2) + ';\n// ── END QUESTIONS DATA';
-
-    let html = fs.readFileSync(MATRIX_FILE, 'utf8');
-    const replaced = html.replace(
-      /const QUESTIONS = \[[\s\S]*?\];\n\/\/ ── END QUESTIONS DATA/,
-      newBlock
+    const db = getPool();
+    if (!db) return res.status(503).json({ error: 'Database not configured' });
+    await db.query(
+      `INSERT INTO matrix_questions (questions) VALUES ($1::jsonb)`,
+      [JSON.stringify(questions)]
     );
-    if (replaced === html) return res.status(500).json({ error: 'QUESTIONS block not found — file may be malformed' });
-
-    fs.writeFileSync(MATRIX_FILE, replaced, 'utf8');
-    res.json({ ok: true, message: 'Matrix updated' });
+    res.json({ ok: true, message: 'Matrix saved to database' });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
